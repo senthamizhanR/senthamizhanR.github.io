@@ -1,0 +1,471 @@
+{
+  "schema_version": "1.0",
+  "export_type": "chat_knowledge_prompt",
+  "title": "Personal CV Website — Senthamizhan R.",
+  "description": "Complete instruction prompt and project knowledge to recreate or continue developing a polished, animated personal CV website for R. Senthamizhan. Captures content, design system, animation primitives, build pipeline, layout decisions, and bug fixes accumulated across an iterative chat session.",
+  "exported_on": "2026-05-07",
+
+  "subject_profile": {
+    "name": "R. Senthamizhan",
+    "preferred_display": "Senthamizhan R.",
+    "title": "Researcher · Nonlinear Dynamics & Mathematical Physics",
+    "affiliation": "Project Associate – I, ANRF · SASTRA Deemed University",
+    "location": "Thanjavur, Tamil Nadu, India",
+    "email": "senthamizhan.phy@gmail.com",
+    "alt_email": "astrothamizh@gmail.com",
+    "phone": "+91 73977 00920",
+    "hero_timeline": "Researcher · 2022 – Present",
+    "summary": "Physics researcher working at the intersection of nonlinear dynamics and mathematical physics. Work focuses on swarmalator systems — populations of agents that simultaneously sync in phase and aggregate in space — exploring chimera states, higher-order harmonics, frustration effects and data-driven analyses of collective behaviour.",
+    "identity_links": {
+      "google_scholar": "https://scholar.google.com/citations?user=qr-JN2cAAAAJ&hl=en",
+      "scholar_id": "qr-JN2cAAAAJ",
+      "orcid": "https://orcid.org/0009-0000-0669-3336",
+      "orcid_id": "0009-0000-0669-3336",
+      "github": "https://github.com/senthamizhanR/",
+      "github_handle": "@senthamizhanR"
+    },
+    "objective_removed": "An earlier objective line ('To become a well-distinguished researcher in the field of nonlinear dynamics.') was removed from the Research section per user request."
+  },
+
+  "content_data": {
+    "metrics": [
+      { "value": "03", "label": "Peer-reviewed papers" },
+      { "value": "03", "label": "Conferences" },
+      { "value": "01", "label": "Best poster award" },
+      { "value": "24/26", "label": "ANRF tenure" }
+    ],
+
+    "marquee_items": [
+      "Nonlinear dynamics",
+      "Mathematical physics",
+      "Swarmalators",
+      "Synchronization",
+      "Chimera states",
+      "Complex systems",
+      "Scientific computing",
+      "High-performance computing"
+    ],
+
+    "research_interests": [
+      "Swarmalators",
+      "Synchronization",
+      "Chimera states",
+      "Complex systems"
+    ],
+    "research_interests_note": "User explicitly removed 'Nonlinear dynamics', 'Mathematical physics', 'Scientific computing', 'High-performance computing' from the topic CARD GRID (they remain in the marquee strip).",
+
+    "skills": [
+      { "group": "Languages", "items": ["C", "Python", "FORTRAN 90/95"] },
+      { "group": "Writing", "items": ["LaTeX"] },
+      { "group": "Tooling", "items": ["GIMP", "Linux", "CUDA"] },
+      { "group": "Currently", "items": ["LLM stack", "Scientific ML", "Simulation"] }
+    ],
+    "skills_note": "Removed per user: 'Manuscripts', 'Posters' (from Writing); 'HPC' (from Tooling).",
+
+    "education": [
+      {
+        "degree": "M.Sc. Physics",
+        "institution": "SASTRA Deemed University · Thanjavur",
+        "years": "2019 – 2021",
+        "score": "GPA 7.89 / 10",
+        "details": "Advanced coursework in physics with analytical, numerical and computational training. M.Sc. project: Within-burst synchrony change among coupled elliptic bursters."
+      },
+      {
+        "degree": "B.Sc. Physics & Computer Science",
+        "institution": "SASTRA · Srinivasa Ramanujan Centre, Kumbakonam",
+        "years": "2016 – 2019",
+        "score": "GPA 7.06 / 10",
+        "details": "Dual-major degree combining physics with computer science — programming languages, coding methodologies and computational problem solving."
+      }
+    ],
+
+    "experience": [
+      {
+        "role": "Project Associate – I",
+        "organization": "ANRF · SASTRA Deemed University",
+        "years": "2024 – Present",
+        "description": "Research role in nonlinear dynamics, scientific computing and complex-systems modelling, funded by the Anusandhan National Research Foundation."
+      },
+      {
+        "role": "Teaching Assistant",
+        "organization": "SASTRA Deemed University",
+        "years": "2022 – 2024",
+        "description": "Supported instruction and research while developing technical communication, mentoring and laboratory skills."
+      }
+    ],
+
+    "publications": [
+      {
+        "title": "Data-driven exploration of swarmalators with second-order harmonics",
+        "authors": "R. Senthamizhan, R. Gopal & V. K. Chandrasekar",
+        "venue": "Physical Review E",
+        "cite": "109(6), 064303",
+        "year": "2024",
+        "status": "Published",
+        "doi": "10.1103/PhysRevE.109.064303",
+        "href": "https://doi.org/10.1103/PhysRevE.109.064303",
+        "tag": "PRE"
+      },
+      {
+        "title": "Frustration-induced chimeras and motion in two-dimensional swarmalators",
+        "authors": "R. Senthamizhan, R. Gopal & V. K. Chandrasekar",
+        "venue": "Chaos, Solitons & Fractals",
+        "cite": "194, 116164",
+        "year": "2025",
+        "status": "Published",
+        "doi": "10.1016/j.chaos.2025.116164",
+        "href": "https://doi.org/10.1016/j.chaos.2025.116164",
+        "tag": "CSF"
+      },
+      {
+        "title": "Swarmalators with frequency-weighted interactions",
+        "authors": "R. Senthamizhan, R. Gopal & V. K. Chandrasekar",
+        "venue": "Physical Review E",
+        "cite": "113, 034216",
+        "year": "2026",
+        "status": "Published",
+        "doi": "10.1103/dhz7-p4yg",
+        "href": "https://doi.org/10.1103/dhz7-p4yg",
+        "tag": "PRE"
+      }
+    ],
+
+    "projects": [
+      {
+        "n": "01",
+        "title": "Frequency-weighted Kuramoto model under biharmonic coupling",
+        "description": "A theoretical exploration of the frequency-weighted Kuramoto model under biharmonic coupling — investigating how the second harmonic in pairwise interactions reshapes synchronization thresholds, hysteresis and emergent collective states.",
+        "tags": ["Kuramoto", "Biharmonic", "Theory"]
+      },
+      {
+        "n": "02",
+        "title": "Data-driven nonlinear dynamics",
+        "description": "Computational and data-driven approaches to nonlinear systems — phase organisation, pattern formation and statistical signatures of collective states.",
+        "tags": ["Python", "Simulation", "Data"]
+      }
+    ],
+    "projects_note": "Removed per user: 'Higher-order harmonics in swarmalators' and '2D chimeras under frustration'. The biharmonic Kuramoto card was added to replace them.",
+
+    "conferences": [
+      { "title": "Complexity & Nonlinear Dynamics in STEM", "event": "CNLDS 2023 · IIT Hyderabad", "date": "05 – 07 June 2023", "highlight": "Best Poster Award" },
+      { "title": "Perspectives in Nonlinear Dynamics", "event": "PNLD · IIT Madras", "date": "01 – 04 August 2023", "highlight": "Participant" },
+      { "title": "Conference on Nonlinear Systems & Dynamics", "event": "CNSD · BDU Trichy", "date": "10 – 13 March 2025", "highlight": "Oral Presentation" }
+    ],
+
+    "awards": [
+      "Best Poster Presentation Award — Complexity and Nonlinear Dynamics in STEM, IIT Hyderabad, 2023"
+    ],
+
+    "references": [
+      {
+        "name": "Dr. V. K. Chandrasekar",
+        "role": "Associate Professor · School of Electrical & Electronics Engineering",
+        "institution": "SASTRA Deemed University",
+        "email": "chandrasekar@eee.sastra.edu"
+      },
+      {
+        "name": "Dr. R. Gopal",
+        "role": "Assistant Professor – II · School of Electrical & Electronics Engineering",
+        "institution": "SASTRA Deemed University",
+        "email": "gopal@eee.sastra.edu"
+      }
+    ],
+
+    "images": {
+      "portrait": "src/assets/portrait.jpg — formal head-and-shoulders shot, navy striped shirt, white background",
+      "poster": "src/assets/poster.jpg — Senthamizhan standing next to his 'Influence of higher-order harmonics in Swarmalators' poster at CNLDS 2023",
+      "award": "src/assets/award.jpg — Senthamizhan receiving Best Poster Award plaque from Dr. on stage at CNLDS 2023"
+    }
+  },
+
+  "design_system": {
+    "philosophy": "Editorial-magazine aesthetic with kinetic React Bits animations. Restrained color palette, large display serif typography paired with neutral sans-serif body, generous whitespace, subtle motion that respects prefers-reduced-motion.",
+    "typography": {
+      "display": "Fraunces (variable, opsz-aware, italic supported)",
+      "body": "Manrope",
+      "mono": "JetBrains Mono",
+      "loaded_via": "Google Fonts <link> in index.html with preconnect"
+    },
+    "color_tokens": {
+      "approach": "Semantic tokens (bg, fg, elev, line, accent, accent2, accent3) backed by CSS variables. Switched per theme via .dark / .light classes on <html>.",
+      "dark_theme": {
+        "bg": "5 6 10 (near-black)",
+        "fg": "244 239 230 (bone)",
+        "elev": "10 11 18 (surface)",
+        "line": "244 239 230 (with --line-alpha 0.10)",
+        "accent": "255 87 34 (warm orange)",
+        "accent2": "103 232 249 (cyan)",
+        "accent3": "167 139 250 (violet)"
+      },
+      "light_theme": {
+        "bg": "244 240 232 (warm cream)",
+        "fg": "14 18 28 (deep ink)",
+        "elev": "255 252 246 (paper)",
+        "line": "14 18 28 (with --line-alpha 0.13)",
+        "accent": "204 60 11 (deeper orange)",
+        "accent2": "13 116 158 (deeper teal)",
+        "accent3": "92 64 200 (deeper violet)"
+      }
+    },
+    "theming": {
+      "toggle_position": "Top-right of nav (sun icon in dark, moon icon in light, animated swap with framer-motion AnimatePresence)",
+      "persistence": "localStorage key 'theme'",
+      "default": "Reads localStorage → falls back to OS prefers-color-scheme → final fallback dark"
+    },
+    "shape_language": {
+      "card_corners": "rounded-[2rem] for sections, rounded-3xl for cards, rounded-full for pills/badges",
+      "borders": "1px translucent (border-line uses --line-alpha)",
+      "shadows": "shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] only on portrait card and a few hero elements"
+    }
+  },
+
+  "tech_stack": {
+    "framework": "Vite 5 + React 18",
+    "styling": "Tailwind CSS 3 with class-based dark mode",
+    "animations": "Framer Motion 11",
+    "build_tools": ["@vitejs/plugin-react", "vite-plugin-singlefile", "postcss", "autoprefixer"],
+    "deps": {
+      "framer-motion": "^11.11.17",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    },
+    "dev_deps": {
+      "@vitejs/plugin-react": "^4.3.4",
+      "autoprefixer": "^10.4.20",
+      "postcss": "^8.4.49",
+      "tailwindcss": "^3.4.17",
+      "vite": "^5.4.11",
+      "vite-plugin-singlefile": "^2.3.3"
+    },
+    "node_min": "Node 18+, tested on Node 22"
+  },
+
+  "build_pipeline": {
+    "scripts": {
+      "dev": "vite — http://localhost:5173",
+      "build": "vite build → dist/ (multi-file, for web hosting)",
+      "build:single": "vite build --config vite.config.single.js → dist-single/index.html (single ~4MB file with everything inlined as base64)",
+      "preview": "vite preview"
+    },
+    "single_file_strategy": {
+      "plugin": "vite-plugin-singlefile inlines JS bundle and CSS into the HTML",
+      "image_inlining": "Vite's assetsInlineLimit set to 100_000_000 so all imported images become base64 data URIs",
+      "image_imports": "Images imported via ES modules in src/data.js (import portraitImg from './assets/portrait.jpg') so Vite controls the inlining",
+      "bundle_size": "~4.5 MB raw, ~3.2 MB gzipped — JS+CSS+three JPEGs",
+      "use_case": "Open by double-click under file:// protocol — no server, no folder structure needed",
+      "rollup_options": "inlineDynamicImports: true, manualChunks: undefined"
+    },
+    "multi_file_base": "vite.config.js sets base: './' so dist/ works at any subpath (Netlify, Vercel, GH Pages, Cloudflare Pages all drop-in)"
+  },
+
+  "project_structure": {
+    "tree": [
+      "cv-site/",
+      "├── src/",
+      "│   ├── App.jsx             — all sections wired together",
+      "│   ├── animations.jsx      — React Bits–style animation primitives",
+      "│   ├── data.js             — ALL CV CONTENT (single source of truth)",
+      "│   ├── index.css           — Tailwind directives + theme CSS variables + custom utilities",
+      "│   ├── main.jsx            — React entry",
+      "│   └── assets/             — portrait.jpg, poster.jpg, award.jpg",
+      "├── index.html              — Google Fonts loaded here",
+      "├── tailwind.config.js      — Semantic color tokens + custom animations",
+      "├── postcss.config.js",
+      "├── vite.config.js          — Multi-file build",
+      "├── vite.config.single.js   — Single-file build (image inlining)",
+      "└── package.json"
+    ],
+    "edit_locations": {
+      "all_text_content": "src/data.js",
+      "section_layouts": "src/App.jsx",
+      "animation_primitives": "src/animations.jsx",
+      "theme_colors": "src/index.css (top of file, :root/html.dark and html.light blocks)",
+      "fonts": "index.html <link> + tailwind.config.js fontFamily",
+      "photos": "src/assets/ (keep filenames the same)"
+    }
+  },
+
+  "animation_primitives": {
+    "philosophy": "Inspired by reactbits.dev. All implemented in src/animations.jsx as small, composable components that respect prefers-reduced-motion via CSS in src/index.css.",
+    "components": [
+      { "name": "SplitText", "purpose": "Letter-by-letter reveal animation, triggered on view", "tech": "framer-motion whileInView with stagger" },
+      { "name": "ShinyText", "purpose": "Animated gradient shimmer sweep over text", "tech": "CSS background-clip: text + animated background-position; shimmer-stops swap with theme via --shimmer-stops" },
+      { "name": "BlurReveal", "purpose": "Fade-up + blur-out on scroll", "tech": "framer-motion whileInView, viewport once:true, amount:0.15" },
+      { "name": "TiltCard", "purpose": "3D pointer-tracked tilt with spring physics", "tech": "framer-motion useMotionValue + useSpring + useTransform; transformPerspective 1200" },
+      { "name": "MagnetButton", "purpose": "Magnetic hover for buttons/links", "tech": "framer-motion useSpring on x/y" },
+      { "name": "ParticleField", "purpose": "Canvas particle network with proximity-based linkages", "tech": "<canvas>, raf loop, configurable density and HSL hue (theme-aware)" },
+      { "name": "AuroraBackground", "purpose": "Conic gradient blob + radial accents + grid + grain over fixed full-viewport layer", "tech": "Pure CSS animations; reads --accent/--accent2/--accent3 vars so it retunes per theme" },
+      { "name": "Marquee", "purpose": "Continuous horizontal scrolling strip", "tech": "Two duplicated tracks translate from 0 to -50%; HARD CSS animation in index.css under .marquee-track class — see critical_lessons.tailwind_purge_bug" },
+      { "name": "Counter", "purpose": "Animated count-up on view", "tech": "raf-driven easeOutCubic; passes through non-numeric strings like '24/26' unchanged" },
+      { "name": "CursorGlow", "purpose": "Soft gradient blob following the cursor", "tech": "framer-motion useSpring on motion values bound to mousemove; pointer-events: none" },
+      { "name": "ScrollProgress", "purpose": "Top progress bar tied to page scroll", "tech": "framer-motion useScroll + useSpring on scaleX with origin-left" }
+    ]
+  },
+
+  "page_sections": [
+    {
+      "id": "top",
+      "name": "Hero",
+      "contains": [
+        "Status pill ('ANRF Project Associate · Open to research collaborations')",
+        "SplitText name 'Senthamizhan R.' (italic display Fraunces)",
+        "Timeline label ('Researcher · 2022 – Present') with left orange accent border",
+        "Description paragraph with ShinyText 'nonlinear dynamics'",
+        "Two CTAs: 'Read the papers' (primary) + 'Contact'",
+        "Location + email",
+        "Identity badges row: Google Scholar / ORCID / GitHub (with proper logo glyphs)",
+        "Portrait card with 4 corner brackets (no labels, no badges)"
+      ],
+      "removed": ["floating 'Best Poster · CNLDS 2023' tag", "/portrait · 26.05.2024 caption", "Project Associate – I subtitle on portrait"]
+    },
+    { "id": "marquee", "name": "Marquee strip", "contains": ["Continuous horizontal scroll of marqueeItems separated by ✦ glyph"] },
+    { "id": "metrics", "name": "Metric grid", "contains": ["4-column grid of animated counters", "Hover line accent slides in from left"] },
+    {
+      "id": "research",
+      "name": "Research focus",
+      "contains": [
+        "Section header 'Synchrony, swarms & complex systems.'",
+        "4 topic cards (TiltCard) — Swarmalators, Synchronization, Chimera states, Complex systems",
+        "Poster image with overlay caption '/ poster presentation · CNLDS 2023' and title 'Influence of higher-order harmonics in swarmalators'",
+        "/now panel beside poster (not below)"
+      ],
+      "removed": ["objective panel", "/fieldwork label changed to /poster presentation"]
+    },
+    {
+      "id": "publications",
+      "name": "Peer-reviewed publications",
+      "contains": [
+        "Filter pills: All / PRE / CSF",
+        "Animated list (framer-motion AnimatePresence layout) with giant year typography on left, paper details right, hover-rotating arrow"
+      ]
+    },
+    {
+      "id": "projects",
+      "name": "Work in progress",
+      "contains": [
+        "2-card grid",
+        "Card 01: Frequency-weighted Kuramoto model under biharmonic coupling",
+        "Card 02: Data-driven nonlinear dynamics"
+      ]
+    },
+    {
+      "id": "cv",
+      "name": "Curriculum vitae",
+      "contains": [
+        "Education timeline (cyan dots)",
+        "Experience timeline (orange dots)",
+        "Award photo card (CNLDS 2023 award ceremony) + Conferences panel",
+        "Skills panel + References panel"
+      ]
+    },
+    {
+      "id": "contact",
+      "name": "Get in touch",
+      "contains": [
+        "Heading 'Let's talk research.'",
+        "Email / Phone / Location row",
+        "Scholar / ORCID / GitHub identity row with their actual IDs visible"
+      ],
+      "removed": ["duplicate Best Poster Award image card that was previously in the contact panel"]
+    },
+    { "id": "footer", "name": "Footer", "contains": ["Giant 'Senthamizhan R.' wordmark", "4 columns: research / contact / identity icons / © year"] }
+  ],
+
+  "responsive_layout": {
+    "breakpoints": {
+      "mobile": "< 768px (Tailwind below md:) — text-first stacked layout, portrait below",
+      "tablet_and_desktop_mode_phone": "≥ 768px (Tailwind md:) — side-by-side: text column flexible (minmax(0,1fr)) + portrait column fixed at 18rem",
+      "desktop": "≥ 1024px (Tailwind lg:) — same as md: but portrait column widens to 22rem and gap becomes lg:gap-16"
+    },
+    "hero_grid_class": "grid gap-12 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16",
+    "portrait_aspect": "aspect-[4/5] on mobile (max-w-[20rem] / sm:max-w-[22rem]); on md+ the column width drives sizing",
+    "hero_section_class": "relative overflow-hidden pb-20 pt-32 md:pb-28 md:pt-40 — NO min-h-[100svh], section sizes to content"
+  },
+
+  "critical_lessons": {
+    "tailwind_purge_bug": {
+      "symptom": "Marquee strip didn't scroll despite the class animate-marquee being present in the markup.",
+      "root_cause": "Class was generated via string interpolation (`animate-${speed}`) in JSX. Tailwind only retains classes it can statically scan as literals — it tree-shook the @keyframes and animation rule from the bundle. The class made it onto the element but had no CSS behind it.",
+      "fix": "Replaced the dynamic class with a hard-coded `.marquee-track` class in src/index.css with its own @keyframes marquee-scroll definition. Bonus: pause on hover and respect prefers-reduced-motion.",
+      "general_takeaway": "Never assemble Tailwind class names via string interpolation. Either use literal class strings or add the class to the safelist in tailwind.config.js."
+    },
+    "file_protocol_module_loading": {
+      "symptom": "Multi-file build (dist/) showed white screen when index.html was opened by double-click instead of via http://localhost.",
+      "root_cause": "<script type=\"module\" crossorigin src=\"./assets/...\"> is blocked by browsers under the file:// protocol due to CORS rules around ES modules.",
+      "fix": "Created a second build target via vite-plugin-singlefile that inlines JS, CSS, and base64 images into one HTML file. Now opens by double-click without a server.",
+      "tradeoff": "Single-file is ~4.5 MB vs the ~330 KB JS + separate images of the multi-file build. Multi-file build remains the right answer for real web hosting."
+    },
+    "image_inlining_via_imports": {
+      "method": "To get Vite to base64-inline images, import them as ES modules: `import portraitImg from './assets/portrait.jpg'`. Combined with `assetsInlineLimit: 100_000_000` in the build config, every imported asset becomes a `data:` URL inside the bundled JS.",
+      "why_string_paths_dont_work": "Plain string paths like './assets/portrait.jpg' aren't seen by Vite as imports — they stay as opaque file references and don't get inlined.",
+      "size_overhead": "Base64 encoding adds ~33% to file size (4 ASCII chars per 3 bytes)."
+    },
+    "useinview_with_fullpage_screenshot": {
+      "symptom": "When taking full-page Playwright screenshots, sections below the initial viewport had empty content.",
+      "root_cause": "Components used framer-motion's `useInView` with `once: true`. During `fullPage: true` capture, Playwright resizes the viewport to the entire page in one shot — IntersectionObserver never sees elements 'enter' the viewport because they're already there from the start.",
+      "fix": "Switched from useInView+animate to `whileInView` with `viewport={{ once: true, amount: 0.15 }}`. whileInView reliably triggers as elements scroll into view; alternative is to scroll the page in steps before screenshotting."
+    },
+    "lg_vs_md_breakpoint_for_desktop_mode_phones": {
+      "symptom": "Phone in Chrome 'Request desktop site' mode showed a stacked mobile layout with the portrait below the text and a huge dead zone.",
+      "root_cause": "Desktop-mode Chrome on a phone reports viewport widths around 980px — just below Tailwind's lg: breakpoint of 1024px. The two-column hero grid was tied to lg:, so it fell back to the default (single-column stacked) layout.",
+      "fix": "Moved the side-by-side layout from lg: to md: (768px). Real mobile (under 768px) still gets stacked; everything else gets the two-column layout."
+    },
+    "fractional_grid_columns_squashing": {
+      "symptom": "On 1440x900 desktop, the portrait got squashed to ~140px wide because the giant 'Senthamizhan R.' typography pushed the text column wider, leaving only scraps for the portrait column.",
+      "root_cause": "Used fractional ratios like `1.45fr | 0.55fr`. fr units distribute REMAINING space after intrinsic content, so the portrait got starved.",
+      "fix": "Use a fixed-width portrait column instead: `md:grid-cols-[minmax(0,1fr)_18rem]`. Text takes whatever's left; portrait stays predictable across viewports."
+    },
+    "min_h_svh_creating_dead_space": {
+      "symptom": "Tall narrow viewports (e.g., phone in desktop mode at 980x1800) showed huge empty space below the hero content.",
+      "root_cause": "Hero had `min-h-[100svh]` forcing it to be at least one viewport tall. On a 1800px tall viewport, that's lots of empty pixels when the content is shorter.",
+      "fix": "Removed min-h. Hero now sizes to its content (pb-20 pt-32 md:pb-28 md:pt-40). The 'scroll' cue still anchors to the section's bottom via absolute positioning."
+    },
+    "reactbits_animations_pattern": "When implementing React Bits-style animations, prefer creating a small primitives module (animations.jsx) with composable, focused components. Each should respect prefers-reduced-motion. Components like SplitText, BlurReveal, TiltCard, MagnetButton, Marquee form a vocabulary that can be reused across sections."
+  },
+
+  "user_modifications_log": [
+    "Removed: Best Poster · CNLDS 2023 floating tag from portrait card",
+    "Removed: portrait label '/portrait · 26.05.2024' and 'Project Associate – I' subtitle on portrait",
+    "Changed: hero timeline from '2024 – Present' to 'Researcher · 2022 – Present'",
+    "Changed: research-focus topics CARD GRID reduced to 4 (Swarmalators, Synchronization, Chimera states, Complex systems)",
+    "Changed: poster overlay caption from '/ fieldwork' to '/ poster presentation'",
+    "Removed: objective panel (was 'To become a well-distinguished researcher in the field of nonlinear dynamics.')",
+    "Changed: /now panel moved to be beside the poster (right column) instead of below as a separate row",
+    "Removed projects: 'Higher-order harmonics in swarmalators' and '2D chimeras under frustration'",
+    "Added project: 'Frequency-weighted Kuramoto model under biharmonic coupling'",
+    "Removed skills: Manuscripts, Posters (Writing), HPC (Tooling)",
+    "Removed: duplicate Best Poster Award image card from Contact section",
+    "Added: Google Scholar (qr-JN2cAAAAJ), ORCID (0009-0000-0669-3336), GitHub (@senthamizhanR) identity links",
+    "Added: dark/light theme toggle with sun/moon icons, OS preference detection, localStorage persistence",
+    "Fixed: marquee not scrolling (Tailwind purge bug — moved animation to hard CSS class .marquee-track)",
+    "Fixed: portrait too large/squashed on landscape — fixed-width portrait column (18rem md, 22rem lg)",
+    "Fixed: side-by-side layout breakpoint (lg: → md:) so desktop-mode phones get proper layout",
+    "Fixed: dead space below hero — removed min-h-[100svh], section sizes to content"
+  ],
+
+  "deliverables_history": [
+    { "name": "cv-site-static.zip", "type": "static dist/ build", "size": "~3.1 MB", "use": "Web hosting, but white-screens under file://" },
+    { "name": "cv-site.html", "type": "single self-contained HTML", "size": "~4.3 MB", "use": "Double-click to open, email, drop on Drive — works offline without a server" },
+    { "name": "cv-site-source.zip", "type": "complete editable source tree", "size": "~3.0 MB", "use": "npm install && npm run dev to edit; npm run build / build:single to ship" }
+  ],
+
+  "recreation_prompt": {
+    "summary": "Build a polished, animated personal CV website for R. Senthamizhan, a researcher in nonlinear dynamics and mathematical physics at SASTRA University. Use Vite + React 18 + Framer Motion + Tailwind CSS. Implement React Bits–style animation primitives (SplitText, BlurReveal, TiltCard, MagnetButton, ParticleField, AuroraBackground, Marquee, Counter, CursorGlow, ScrollProgress) in a dedicated animations.jsx module. Drive all content from a single src/data.js file. Use semantic color tokens (bg, fg, accent, accent2, accent3) backed by CSS variables that swap on .dark / .light classes for a working dark/light theme toggle. Provide both a multi-file build for hosting and a single-file build that inlines images as base64 for offline distribution.",
+    "must_have_sections": ["Hero with portrait", "Marquee", "Metrics", "Research focus with poster", "Publications (filterable)", "Projects", "CV (education + experience + award + conferences + skills + references)", "Contact with identity links", "Footer"],
+    "must_have_decisions": [
+      "Hero side-by-side layout activates at md: (768px), NOT lg: — to handle desktop-mode phones",
+      "Portrait column is fixed-width (18rem md, 22rem lg), NOT fractional — to prevent squashing",
+      "Hero section has NO min-h — sizes to content to avoid dead space",
+      "Marquee animation MUST be a hard CSS class with @keyframes in index.css — NOT a Tailwind animate-* class assembled via string interpolation",
+      "Images MUST be ES module imports for the single-file build to inline them",
+      "Theme tokens MUST flow from CSS variables so particle field, aurora, shimmer text all retune in one place"
+    ],
+    "must_avoid": [
+      "Any text labels or floating tags overlaid on the portrait card — clean photo only",
+      "An 'objective' panel — user removed it",
+      "Reproducing the previous 'Higher-order harmonics' or '2D chimeras' project cards — replaced",
+      "A duplicate award image card in the Contact section — single contact panel only",
+      "Generic AI-design aesthetics — favor restrained editorial-magazine look with Fraunces display + Manrope body"
+    ]
+  }
+}
