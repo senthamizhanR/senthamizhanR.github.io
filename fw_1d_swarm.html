@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequency-weighted swarmalators · interactive visualizer</title>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      color-scheme: light;
+      /* names kept as --md-* so the canvas renderer reads them directly */
+      --paper: #e9eef7;
+      --md-surface: #ffffff;
+      --surface-2: #f1f5fc;
+      --md-text: #161b26;
+      --md-muted: #5b6678;
+      --line: #d2dbeb;
+      --line-strong: #b9c4da;
+      --md-primary: #2348c9;        /* cobalt  · S+ channel · ω ≥ 0 */
+      --md-secondary: #e0502f;      /* coral   · S- channel        */
+      --md-tertiary: #e0502f;       /* coral   · ω < 0 points       */
+      --md-primary-soft: #dde5ff;
+      --md-secondary-soft: #ffe2da;
+      --grid: rgba(22, 27, 38, .07);
+      --canvas-bg: #ffffff;
+      --shadow: 0 1px 2px rgba(22,27,38,.04), 0 18px 44px -22px rgba(22,27,38,.30);
+      --ring: 0 0 0 3px rgba(35,72,201,.28);
+      --r-lg: 22px;
+      --r-md: 16px;
+      --r-sm: 11px;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #080b15;
+      --md-surface: #111726;
+      --surface-2: #18202f;
+      --md-text: #e8eefb;
+      --md-muted: #98a5bd;
+      --line: #25304a;
+      --line-strong: #33415f;
+      --md-primary: #5d86ff;
+      --md-secondary: #ff7d5e;
+      --md-tertiary: #ff7d5e;
+      --md-primary-soft: #1c2c52;
+      --md-secondary-soft: #3a2018;
+      --grid: rgba(232, 238, 251, .10);
+      --canvas-bg: #0d1320;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 22px 50px -24px rgba(0,0,0,.7);
+      --ring: 0 0 0 3px rgba(93,134,255,.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      color: var(--md-text);
+      background:
+        radial-gradient(120% 90% at 100% -10%, color-mix(in srgb, var(--md-primary) 12%, transparent), transparent 55%),
+        radial-gradient(120% 90% at -10% 0%, color-mix(in srgb, var(--md-secondary) 9%, transparent), transparent 50%),
+        var(--paper);
+      -webkit-font-smoothing: antialiased;
+      transition: background .3s ease, color .3s ease;
+    }
+
+    .wrap { max-width: 1240px; margin: 0 auto; padding: clamp(16px, 3vw, 40px); }
+
+    a { color: var(--md-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    h1, h2, h3, .display { font-family: "Space Grotesk", system-ui, sans-serif; letter-spacing: -.01em; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+    .eyebrow {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .72rem; font-weight: 600; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--md-muted);
+    }
+    .muted { color: var(--md-muted); }
+
+    /* ---------- masthead ---------- */
+    .masthead {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      justify-content: space-between; margin-bottom: clamp(18px, 3vw, 30px);
+    }
+    .brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .mark { flex: none; width: 52px; height: 52px; }
+    .brand h1 { margin: 0; font-size: clamp(1.45rem, 1rem + 2vw, 2.35rem); font-weight: 700; line-height: 1.02; }
+    .brand p { margin: 4px 0 0; font-size: clamp(.85rem, .8rem + .3vw, .98rem); max-width: 52ch; }
+
+    .theme-btn {
+      flex: none; cursor: pointer; font: 600 .82rem/1 "IBM Plex Sans", sans-serif;
+      color: var(--md-text); background: var(--md-surface);
+      border: 1px solid var(--line); border-radius: 999px; padding: .6rem .95rem;
+      display: inline-flex; align-items: center; gap: .5rem; transition: border-color .2s, transform .15s;
+    }
+    .theme-btn:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+    .theme-btn svg { width: 15px; height: 15px; }
+
+    /* ---------- tabs ---------- */
+    .tabs {
+      display: inline-flex; gap: 4px; padding: 4px; margin-bottom: clamp(16px, 2.4vw, 24px);
+      background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
+    }
+    .tab {
+      cursor: pointer; border: 0; background: transparent; color: var(--md-muted);
+      font: 600 .9rem/1 "Space Grotesk", sans-serif; padding: .6rem 1.1rem; border-radius: 999px;
+      transition: color .2s, background .2s; white-space: nowrap;
+    }
+    .tab.active { color: #fff; background: var(--md-primary); box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--md-primary) 70%, transparent); }
+    html[data-theme="dark"] .tab.active { color: #0b1020; }
+
+    /* ---------- panels ---------- */
+    .panel {
+      background: var(--md-surface); border: 1px solid var(--line);
+      border-radius: var(--r-lg); box-shadow: var(--shadow);
+    }
+    .layout { display: grid; gap: clamp(14px, 2vw, 22px); grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 940px) {
+      .layout { grid-template-columns: minmax(300px, 350px) minmax(0, 1fr); align-items: start; }
+      .rail { position: sticky; top: 18px; }
+    }
+    .stage { display: grid; gap: clamp(14px, 2vw, 22px); min-width: 0; }
+
+    .rail { padding: clamp(18px, 2vw, 24px); }
+    .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .rail-head h2 { margin: 0; font-size: 1.18rem; }
+    .status {
+      font: 600 .68rem/1 "IBM Plex Mono", monospace; letter-spacing: .12em;
+      padding: .4rem .6rem; border-radius: 999px;
+      background: var(--md-secondary-soft); color: var(--md-secondary);
+    }
+    .status.live { background: var(--md-primary-soft); color: var(--md-primary); }
+
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .btn {
+      cursor: pointer; border: 1px solid var(--line); border-radius: var(--r-sm);
+      padding: .72rem .9rem; font: 600 .92rem/1 "Space Grotesk", sans-serif;
+      background: var(--md-surface); color: var(--md-text);
+      transition: transform .15s, border-color .2s, background .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: none; box-shadow: var(--ring); }
+    .btn.primary { background: var(--md-primary); color: #fff; border-color: transparent; }
+    html[data-theme="dark"] .btn.primary { color: #0b1020; }
+    .btn.primary:hover { box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--md-primary) 75%, transparent); }
+
+    .field { margin-top: 20px; }
+    .field-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .field-top label { font-weight: 600; font-size: .94rem; }
+    .val {
+      font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .82rem;
+      padding: .2rem .5rem; border-radius: 7px; background: var(--surface-2);
+      border: 1px solid var(--line); min-width: 3.4ch; text-align: center;
+    }
+    .scale { display: flex; justify-content: space-between; margin-top: 5px; font-size: .7rem; color: var(--md-muted); }
+    .scale.three { justify-content: space-between; }
+
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none; width: 100%; height: 5px; margin-top: 12px;
+      background: var(--line); border-radius: 999px; outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--md-surface); border: 3px solid var(--md-primary);
+      box-shadow: 0 2px 6px rgba(22,27,38,.25); transition: transform .12s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%; background: var(--md-surface);
+      border: 3px solid var(--md-primary); box-shadow: 0 2px 6px rgba(22,27,38,.25);
+    }
+    input[type="range"]:focus-visible { box-shadow: var(--ring); }
+
+    .group { margin-top: 20px; padding: 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); }
+    .group label { font-weight: 600; font-size: .94rem; }
+    .n-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; }
+    input[type="number"] {
+      font: 500 .95rem "IBM Plex Mono", monospace; color: var(--md-text);
+      background: var(--md-surface); border: 1px solid var(--line); border-radius: var(--r-sm);
+      padding: .6rem .7rem; outline: none; width: 100%;
+    }
+    input[type="number"]:focus-visible { box-shadow: var(--ring); border-color: var(--md-primary); }
+    .note { margin: 10px 0 0; font-size: .78rem; color: var(--md-muted); }
+
+    .presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .preset { display: flex; flex-direction: column; gap: 3px; align-items: center; padding: .6rem .3rem; }
+    .preset b { font: 700 .95rem "Space Grotesk", sans-serif; }
+    .preset span { font: 500 .68rem "IBM Plex Mono", monospace; color: var(--md-muted); }
+
+    details.tuning { margin-top: 18px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); overflow: hidden; }
+    details.tuning > summary { cursor: pointer; list-style: none; padding: 13px 16px; font: 600 .9rem "Space Grotesk", sans-serif; display: flex; justify-content: space-between; align-items: center; }
+    details.tuning > summary::-webkit-details-marker { display: none; }
+    details.tuning > summary::after { content: "+"; font-family: "IBM Plex Mono", monospace; color: var(--md-muted); }
+    details.tuning[open] > summary::after { content: "−"; }
+    .tuning-body { padding: 0 16px 16px; }
+
+    .readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .readout { padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); }
+    .readout .k { font-size: .72rem; color: var(--md-muted); }
+    .readout .v { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 1.28rem; margin-top: 2px; }
+    .readout .v.p { color: var(--md-primary); }
+    .readout .v.s { color: var(--md-secondary); }
+
+    /* ---------- plot cards ---------- */
+    .plot-card { padding: clamp(16px, 1.8vw, 22px); }
+    .plot-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .plot-head h2 { margin: 0; font-size: clamp(1.1rem, 1rem + .5vw, 1.4rem); }
+    .plot-head p { margin: 3px 0 0; font-size: .85rem; color: var(--md-muted); }
+    .legend { display: flex; gap: 14px; font: 600 .78rem "IBM Plex Sans", sans-serif; color: var(--md-muted); }
+    .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; vertical-align: -1px; margin-right: 5px; }
+
+    .scatter-wrap { width: 100%; max-width: 560px; margin: 0 auto; aspect-ratio: 1 / 1; }
+    .series-wrap { width: 100%; aspect-ratio: 16 / 6; min-height: 210px; max-height: 360px; }
+    canvas { width: 100%; height: 100%; display: block; background: var(--canvas-bg); border-radius: var(--r-md); }
+
+    .figcap {
+      margin: 10px 2px 0; font: italic 400 .76rem "Times New Roman", Times, serif;
+      color: var(--md-muted); text-align: center;
+    }
+    .figcap b { font-style: normal; font-weight: 700; letter-spacing: .04em; }
+
+    /* ---------- model tab ---------- */
+    .cite {
+      padding: clamp(20px, 2.6vw, 30px);
+      border-left: 4px solid var(--md-primary);
+      background: linear-gradient(120deg, color-mix(in srgb, var(--md-primary) 7%, var(--md-surface)), var(--md-surface) 60%);
+    }
+    .cite .eyebrow { color: var(--md-primary); }
+    .cite h2 { margin: 10px 0 8px; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.95rem); max-width: 24ch; }
+    .cite .authors { font-size: 1rem; font-weight: 500; }
+    .cite .affil { margin-top: 4px; font-size: .85rem; color: var(--md-muted); max-width: 60ch; }
+    .cite .meta { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .doi-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: .6rem 1rem;
+      background: var(--md-primary); color: #fff; border-radius: 999px;
+      font: 600 .88rem "Space Grotesk", sans-serif; transition: transform .15s, box-shadow .2s;
+    }
+    html[data-theme="dark"] .doi-btn { color: #0b1020; }
+    .doi-btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--md-primary) 75%, transparent); }
+    .doi-code { font-family: "IBM Plex Mono", monospace; font-size: .82rem; color: var(--md-muted); }
+
+    .cards { display: grid; gap: clamp(14px, 2vw, 20px); margin-top: clamp(16px, 2vw, 22px); grid-template-columns: minmax(0,1fr); }
+    @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } }
+    .card { padding: clamp(18px, 2vw, 24px); }
+    .card.full { grid-column: 1 / -1; }
+    .card h3 { margin: 0 0 6px; font-size: 1.12rem; }
+    .card p { margin: 8px 0 0; font-size: .9rem; color: var(--md-muted); line-height: 1.55; }
+    .card ul { margin: 10px 0 0; padding-left: 1.1rem; font-size: .9rem; color: var(--md-muted); line-height: 1.7; }
+    .math-panel { overflow-x: auto; }
+    mjx-container { margin: 6px 0 !important; }
+
+    footer { margin-top: clamp(20px, 3vw, 34px); text-align: center; font-size: .8rem; color: var(--md-muted); }
+
+    .hidden { display: none !important; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    :focus-visible { outline: none; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- ===================== masthead ===================== -->
+    <header class="masthead">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+          <circle cx="26" cy="26" r="22" stroke="var(--md-primary)" stroke-width="1.6" opacity=".35"/>
+          <circle cx="26" cy="26" r="14" stroke="var(--md-secondary)" stroke-width="1.6" opacity=".35"/>
+          <circle cx="26" cy="4.5" r="3.4" fill="var(--md-primary)"/>
+          <circle cx="44" cy="34" r="3.4" fill="var(--md-primary)"/>
+          <circle cx="9" cy="20" r="3" fill="var(--md-secondary)"/>
+          <circle cx="35" cy="47" r="2.8" fill="var(--md-secondary)"/>
+          <circle cx="26" cy="26" r="2.4" fill="var(--md-text)"/>
+        </svg>
+        <div>
+          <h1>Frequency-weighted swarmalators</h1>
+          <p>Drive the spatial coupling <span class="mono">J</span> and phase coupling <span class="mono">K</span> and watch the asynchronous, phase-wave, and bi-strip mixed states form on the ring.</p>
+        </div>
+      </div>
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button id="simTabBtn" class="tab active" type="button" role="tab">Simulation</button>
+      <button id="modelTabBtn" class="tab" type="button" role="tab">Model &amp; details</button>
+    </div>
+
+    <!-- ===================== simulation ===================== -->
+    <section id="simTab" class="layout">
+      <aside class="panel rail">
+        <div class="rail-head">
+          <h2>Controls</h2>
+          <span id="runBadge" class="status">PAUSED</span>
+        </div>
+
+        <div class="btn-row">
+          <button id="playPauseBtn" class="btn primary" type="button">Play</button>
+          <button id="resetBtn" class="btn" type="button">Reset</button>
+        </div>
+
+        <div class="field">
+          <div class="field-top">
+            <label for="jSlider">Spatial coupling \(J\)</label>
+            <output id="jValue" class="val">12.0</output>
+          </div>
+          <input id="jSlider" type="range" min="-20" max="20" step="0.1" value="12" />
+          <div class="scale three"><span>−20</span><span>0</span><span>20</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-top">
+            <label for="kSlider">Phase coupling \(K\)</label>
+            <output id="kValue" class="val">0.5</output>
+          </div>
+          <input id="kSlider" type="range" min="-12" max="12" step="0.1" value="0.5" />
+          <div class="scale three"><span>−12</span><span>0</span><span>12</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-top">
+            <label for="sizeSlider">Particle size</label>
+            <output id="sizeValue" class="val">2.2</output>
+          </div>
+          <input id="sizeSlider" type="range" min="0.5" max="6" step="0.1" value="2.2" />
+          <div class="scale"><span>fine</span><span>bold</span></div>
+        </div>
+
+        <div class="group">
+          <label for="nInput">Population \(N\)</label>
+          <div class="n-row">
+            <input id="nInput" type="number" min="20" max="5000" step="10" value="250" />
+            <button id="updateNBtn" class="btn" type="button">Update</button>
+          </div>
+          <p class="note">Regenerates the ensemble, clears history, and pauses.</p>
+        </div>
+
+        <div class="presets">
+          <button class="btn preset" data-preset="as" type="button"><b>AS</b><span>12, −8</span></button>
+          <button class="btn preset" data-preset="pw" type="button"><b>PW</b><span>12, 0.5</span></button>
+          <button class="btn preset" data-preset="bm" type="button"><b>BM</b><span>12, 10</span></button>
+        </div>
+
+        <details class="tuning">
+          <summary>Solver tuning</summary>
+          <div class="tuning-body">
+            <div class="field" style="margin-top:14px">
+              <div class="field-top">
+                <label for="dtSlider">Euler step \(\Delta t\)</label>
+                <output id="dtValue" class="val">0.015</output>
+              </div>
+              <input id="dtSlider" type="range" min="0.002" max="0.05" step="0.001" value="0.015" />
+            </div>
+            <div class="field">
+              <div class="field-top">
+                <label for="speedSlider">Steps / frame</label>
+                <output id="speedValue" class="val">4</output>
+              </div>
+              <input id="speedSlider" type="range" min="1" max="20" step="1" value="4" />
+            </div>
+          </div>
+        </details>
+
+        <div class="readouts">
+          <div class="readout"><div class="k">Time</div><div id="timeReadout" class="v">0.00</div></div>
+          <div class="readout"><div class="k">State</div><div id="stateReadout" class="v" style="font-size:1.05rem">initial</div></div>
+          <div class="readout"><div class="k">\(S_+\)</div><div id="sPlusReadout" class="v p">0.000</div></div>
+          <div class="readout"><div class="k">\(S_-\)</div><div id="sMinusReadout" class="v s">0.000</div></div>
+        </div>
+      </aside>
+
+      <div class="stage">
+        <div class="panel plot-card">
+          <div class="plot-head">
+            <div>
+              <h2>Phase-space portrait</h2>
+              <p>Position \(x_i\) versus internal phase \(\theta_i\).</p>
+            </div>
+            <div class="legend">
+              <span><i style="background:var(--md-primary)"></i>\(\omega_i \ge 0\)</span>
+              <span><i style="background:var(--md-tertiary)"></i>\(\omega_i < 0\)</span>
+            </div>
+          </div>
+          <div class="scatter-wrap"><canvas id="scatterCanvas" aria-label="x versus theta scatter plot"></canvas></div>
+          <p class="figcap"><b>FIG. 1.</b> Instantaneous \(x\)–\(\theta\) distribution, colored by the sign of \(\omega_i\).</p>
+        </div>
+
+        <div class="panel plot-card">
+          <div class="plot-head">
+            <div>
+              <h2>Order parameters \(S_\pm(t)\)</h2>
+              <p>Coherence in the sum and difference channels over time.</p>
+            </div>
+            <button id="clearHistoryBtn" class="btn" type="button" style="padding:.5rem .85rem;font-size:.82rem">Clear history</button>
+          </div>
+          <div class="series-wrap"><canvas id="seriesCanvas" aria-label="Order parameter time series"></canvas></div>
+          <p class="figcap"><b>FIG. 2.</b> Live history of \(S_+\) (sum) and \(S_-\) (difference) channels.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== model & details ===================== -->
+    <section id="modelTab" class="hidden math-panel">
+      <div class="panel cite">
+        <div class="eyebrow">Reference paper</div>
+        <h2>Swarmalators with frequency-weighted interactions</h2>
+        <div class="authors">R. Senthamizhan, R. Gopal, V. K. Chandrasekar</div>
+        <div class="affil">Centre for Nonlinear Science and Engineering, School of Electrical and Electronics Engineering, SASTRA Deemed University, Thanjavur 613 401, India.</div>
+        <div class="meta">
+          <a class="doi-btn" href="https://doi.org/10.1103/dhz7-p4yg" target="_blank" rel="noopener">
+            Read on APS
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <span class="doi-code">doi:10.1103/dhz7-p4yg · American Physical Society</span>
+        </div>
+      </div>
+
+      <div class="cards">
+        <article class="panel card">
+          <h3>Governing equations</h3>
+          <p>Each swarmalator \(i\) has position \(x_i\in[-\pi,\pi]\) and phase \(\theta_i\in[-\pi,\pi]\):</p>
+          \[ \dot{x}_i = v_i + \frac{J}{N}\sum_{j}\sin(x_j-x_i)\,|\omega_i|\cos(\theta_j-\theta_i), \]
+          \[ \dot{\theta}_i = \omega_i + \frac{K}{N}\sum_{j}\cos(x_j-x_i)\,|\omega_i|\sin(\theta_j-\theta_i). \]
+          <p>\(J\) sets spatial attraction and \(K\) sets phase synchronization; the factor \(|\omega_i|\) makes each agent's influence frequency weighted.</p>
+        </article>
+
+        <article class="panel card">
+          <h3>Order parameters</h3>
+          <p>The coupled space–phase coherence channels are</p>
+          \[ W^{\pm}=S_{\pm}e^{i\psi_{\pm}}=\frac{1}{N}\sum_{j}e^{i(x_j\pm\theta_j)}. \]
+          <p>Small \(S_\pm\) marks the asynchronous cloud; one dominant channel marks the phase-wave strip; both large indicates the bi-strip mixed state.</p>
+        </article>
+
+        <article class="panel card full">
+          <h3>Exact mean-field reduction (used here)</h3>
+          <p>Product-to-sum identities collapse the \(O(N^2)\) pairwise sums into \(O(N)\) terms expressed through \(W^{\pm}\), so the loop below is exact, not approximate:</p>
+          \[ F_i^+ = S_+\sin(\psi_+ - x_i - \theta_i), \qquad F_i^- = S_-\sin(\psi_- - x_i + \theta_i). \]
+          \[ \dot{x}_i = v_i + \tfrac{1}{2}J|\omega_i|\left(F_i^+ + F_i^-\right), \qquad \dot{\theta}_i = \omega_i + \tfrac{1}{2}K|\omega_i|\left(F_i^+ - F_i^-\right). \]
+          <p>This keeps the same interaction law as the pairwise model while staying fast enough for real-time rendering at large \(N\).</p>
+        </article>
+
+        <article class="panel card">
+          <h3>Integration</h3>
+          <p>Explicit Euler with wrapping to \([-\pi,\pi]\):</p>
+          \[ x_i(t+\Delta t)=\mathrm{wrap}\!\left[x_i + \Delta t\,\dot{x}_i\right]. \]
+          <p>Default \(\Delta t = 0.015\) with four steps per frame. Reduce \(\Delta t\) if the portrait becomes noisy at strong coupling.</p>
+        </article>
+
+        <article class="panel card">
+          <h3>Ensemble &amp; presets</h3>
+          <ul>
+            <li>\(x_i,\theta_i\) uniform on \([-\pi,\pi]\).</li>
+            <li>\(v_i,\omega_i\) drawn from centered Cauchy \((\gamma=1)\), clipped to \(|\cdot|\le 8\).</li>
+            <li>Presets: AS \((12,-8)\), PW \((12,0.5)\), BM \((12,10)\).</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <footer>Interactive companion to Senthamizhan, Gopal &amp; Chandrasekar · for qualitative exploration, not continuation-grade analysis.</footer>
+  </div>
+
+  <script>
+    'use strict';
+
+    const TWO_PI = 2 * Math.PI;
+    const PI = Math.PI;
+    const MAX_HISTORY = 900;
+    const FREQ_CAP = 8;
+    const PLOT_FONT = '"Times New Roman", Times, serif';
+
+    const els = {
+      scatter: document.getElementById('scatterCanvas'),
+      series: document.getElementById('seriesCanvas'),
+      playPause: document.getElementById('playPauseBtn'),
+      reset: document.getElementById('resetBtn'),
+      updateN: document.getElementById('updateNBtn'),
+      clearHistory: document.getElementById('clearHistoryBtn'),
+      jSlider: document.getElementById('jSlider'),
+      kSlider: document.getElementById('kSlider'),
+      sizeSlider: document.getElementById('sizeSlider'),
+      dtSlider: document.getElementById('dtSlider'),
+      speedSlider: document.getElementById('speedSlider'),
+      nInput: document.getElementById('nInput'),
+      jValue: document.getElementById('jValue'),
+      kValue: document.getElementById('kValue'),
+      sizeValue: document.getElementById('sizeValue'),
+      dtValue: document.getElementById('dtValue'),
+      speedValue: document.getElementById('speedValue'),
+      runBadge: document.getElementById('runBadge'),
+      time: document.getElementById('timeReadout'),
+      sPlus: document.getElementById('sPlusReadout'),
+      sMinus: document.getElementById('sMinusReadout'),
+      state: document.getElementById('stateReadout'),
+      themeToggle: document.getElementById('themeToggle'),
+      themeLabel: document.getElementById('themeLabel'),
+      simTabBtn: document.getElementById('simTabBtn'),
+      modelTabBtn: document.getElementById('modelTabBtn'),
+      simTab: document.getElementById('simTab'),
+      modelTab: document.getElementById('modelTab')
+    };
+
+    const state = {
+      N: 250,
+      J: 12,
+      K: 0.5,
+      dt: 0.015,
+      stepsPerFrame: 4,
+      pointSize: 2.2,
+      running: false,
+      t: 0,
+      x: new Float64Array(0),
+      theta: new Float64Array(0),
+      v: new Float64Array(0),
+      omega: new Float64Array(0),
+      Wp: { re: 0, im: 0, S: 0, psi: 0 },
+      Wm: { re: 0, im: 0, S: 0, psi: 0 },
+      history: []
+    };
+
+    /* ---------- helpers ---------- */
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+    function colorMix(hex, alpha) {
+      const v = hex.replace('#', '');
+      const r = parseInt(v.slice(0, 2), 16);
+      const g = parseInt(v.slice(2, 4), 16);
+      const b = parseInt(v.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      els.themeLabel.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      drawAll();
+    }
+    function randUniform(min, max) { return min + (max - min) * Math.random(); }
+    function cauchy(scale = 1) {
+      const u = Math.min(1 - 1e-12, Math.max(1e-12, Math.random()));
+      const sample = scale * Math.tan(Math.PI * (u - 0.5));
+      return Math.max(-FREQ_CAP, Math.min(FREQ_CAP, sample));
+    }
+    function wrapAngle(a) {
+      a = (a + PI) % TWO_PI;
+      if (a < 0) a += TWO_PI;
+      return a - PI;
+    }
+
+    /* ---------- physics (preserved) ---------- */
+    function initialiseSystem(n = state.N) {
+      state.N = Math.max(20, Math.min(5000, Math.round(Number(n) || 250)));
+      els.nInput.value = state.N;
+      state.x = new Float64Array(state.N);
+      state.theta = new Float64Array(state.N);
+      state.v = new Float64Array(state.N);
+      state.omega = new Float64Array(state.N);
+      for (let i = 0; i < state.N; i++) {
+        state.x[i] = randUniform(-PI, PI);
+        state.theta[i] = randUniform(-PI, PI);
+        state.v[i] = cauchy(1);
+        state.omega[i] = cauchy(1);
+      }
+      state.t = 0;
+      state.history = [];
+      state.running = false;
+      updateRunUI();
+      computeOrderParameters();
+      pushHistory();
+      updateReadouts();
+      drawAll();
+    }
+
+    function computeOrderParameters() {
+      let wpRe = 0, wpIm = 0, wmRe = 0, wmIm = 0;
+      const N = state.N;
+      for (let i = 0; i < N; i++) {
+        const eps = state.x[i] + state.theta[i];
+        const eta = state.x[i] - state.theta[i];
+        wpRe += Math.cos(eps);
+        wpIm += Math.sin(eps);
+        wmRe += Math.cos(eta);
+        wmIm += Math.sin(eta);
+      }
+      wpRe /= N; wpIm /= N; wmRe /= N; wmIm /= N;
+      state.Wp.re = wpRe; state.Wp.im = wpIm;
+      state.Wm.re = wmRe; state.Wm.im = wmIm;
+      state.Wp.S = Math.hypot(wpRe, wpIm);
+      state.Wm.S = Math.hypot(wmRe, wmIm);
+      state.Wp.psi = Math.atan2(wpIm, wpRe);
+      state.Wm.psi = Math.atan2(wmIm, wmRe);
+    }
+
+    function eulerStep() {
+      computeOrderParameters();
+      const { N, x, theta, v, omega, J, K, dt, Wp, Wm } = state;
+      const halfJ = 0.5 * J;
+      const halfK = 0.5 * K;
+      for (let i = 0; i < N; i++) {
+        const eps = x[i] + theta[i];
+        const eta = x[i] - theta[i];
+        const fp = Wp.S * Math.sin(Wp.psi - eps);
+        const fm = Wm.S * Math.sin(Wm.psi - eta);
+        const absOmega = Math.abs(omega[i]);
+        const dx = v[i] + absOmega * halfJ * (fp + fm);
+        const dth = omega[i] + absOmega * halfK * (fp - fm);
+        x[i] = wrapAngle(x[i] + dt * dx);
+        theta[i] = wrapAngle(theta[i] + dt * dth);
+      }
+      state.t += dt;
+      computeOrderParameters();
+    }
+
+    function pushHistory() {
+      state.history.push({ t: state.t, sp: state.Wp.S, sm: state.Wm.S });
+      if (state.history.length > MAX_HISTORY) state.history.splice(0, state.history.length - MAX_HISTORY);
+    }
+
+    function classifyState() {
+      const sp = state.Wp.S;
+      const sm = state.Wm.S;
+      const low = 0.22, mid = 0.36;
+      if (sp < low && sm < low) return 'AS-like';
+      if (sp > mid && sm > mid) return 'BM-like';
+      if (Math.max(sp, sm) > mid) return 'PW-like';
+      return 'mixed';
+    }
+
+    function updateReadouts() {
+      els.time.textContent = state.t.toFixed(2);
+      els.sPlus.textContent = state.Wp.S.toFixed(3);
+      els.sMinus.textContent = state.Wm.S.toFixed(3);
+      els.state.textContent = classifyState();
+    }
+
+    function updateRunUI() {
+      els.playPause.textContent = state.running ? 'Pause' : 'Play';
+      els.runBadge.textContent = state.running ? 'RUNNING' : 'PAUSED';
+      els.runBadge.classList.toggle('live', state.running);
+    }
+
+    /* ---------- canvas ---------- */
+    function resizeCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const w = Math.floor(rect.width * dpr);
+      const h = Math.floor(rect.height * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, width: rect.width, height: rect.height, dpr };
+    }
+
+    function clearCanvas(ctx, width, height) {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = cssVar('--canvas-bg');
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // Plot ticks + axis labels rendered in Times New Roman (journal-figure style).
+    function drawAxes(ctx, width, height, margin, xLabel, yLabel, y01 = false) {
+      const text = cssVar('--md-text');
+      const grid = cssVar('--grid');
+      const border = colorMix(cssVar('--md-text'), 0.5);
+      const plotW = width - 2 * margin;
+      const plotH = height - 2 * margin;
+
+      ctx.save();
+      ctx.textBaseline = 'middle';
+
+      // gridlines + serif tick labels
+      ctx.font = `13px ${PLOT_FONT}`;
+      ctx.lineWidth = 1;
+      const xticks = [0, 0.5, 1];
+      const xlabels = ['−π', '0', 'π'];
+      for (let i = 0; i < xticks.length; i++) {
+        const x = margin + xticks[i] * plotW;
+        ctx.strokeStyle = grid;
+        ctx.beginPath(); ctx.moveTo(x, margin); ctx.lineTo(x, height - margin); ctx.stroke();
+        ctx.fillStyle = text;
+        ctx.textAlign = 'center';
+        ctx.fillText(xlabels[i], x, height - margin + 18);
+      }
+      const yticks = y01 ? [0, .25, .5, .75, 1] : [0, .5, 1];
+      const ylabels = y01 ? ['0', '.25', '.5', '.75', '1'] : ['−π', '0', 'π'];
+      for (let i = 0; i < yticks.length; i++) {
+        const y = height - margin - yticks[i] * plotH;
+        ctx.strokeStyle = grid;
+        ctx.beginPath(); ctx.moveTo(margin, y); ctx.lineTo(width - margin, y); ctx.stroke();
+        ctx.fillStyle = text;
+        ctx.textAlign = 'right';
+        ctx.fillText(ylabels[i], margin - 9, y);
+      }
+
+      // box border
+      ctx.strokeStyle = border;
+      ctx.lineWidth = 1.3;
+      ctx.strokeRect(margin, margin, plotW, plotH);
+
+      // italic serif axis labels
+      ctx.fillStyle = text;
+      ctx.font = `italic 17px ${PLOT_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(xLabel, width / 2, height - 11);
+      ctx.save();
+      ctx.translate(14, height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(yLabel, 0, 0);
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawScatter() {
+      const { ctx, width, height } = resizeCanvas(els.scatter);
+      clearCanvas(ctx, width, height);
+      const margin = Math.max(38, Math.min(54, width * 0.09));
+      drawAxes(ctx, width, height, margin, 'x', 'θ', false);
+      const plotW = width - 2 * margin;
+      const plotH = height - 2 * margin;
+      const primary = cssVar('--md-primary');
+      const tertiary = cssVar('--md-tertiary');
+      const pointRadius = state.pointSize;
+      ctx.save();
+      for (let i = 0; i < state.N; i++) {
+        const px = margin + ((state.x[i] + PI) / TWO_PI) * plotW;
+        const py = margin + (1 - ((state.theta[i] + PI) / TWO_PI)) * plotH;
+        ctx.beginPath();
+        ctx.fillStyle = state.omega[i] >= 0 ? colorMix(primary, .78) : colorMix(tertiary, .78);
+        ctx.arc(px, py, pointRadius, 0, TWO_PI);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // in-plot readout, serif to match journal figure
+      ctx.save();
+      ctx.font = `italic 13px ${PLOT_FONT}`;
+      ctx.fillStyle = cssVar('--md-muted');
+      ctx.textAlign = 'left';
+      ctx.fillText(`N = ${state.N}    J = ${state.J.toFixed(1)}    K = ${state.K.toFixed(1)}`, margin + 2, margin - 13);
+      ctx.restore();
+    }
+
+    function drawSeries() {
+      const { ctx, width, height } = resizeCanvas(els.series);
+      clearCanvas(ctx, width, height);
+      const margin = Math.max(42, Math.min(58, width * 0.09));
+      drawAxes(ctx, width, height, margin, 't', 'S±', true);
+      const h = state.history;
+      const plotW = width - 2 * margin;
+      const plotH = height - 2 * margin;
+      if (h.length < 2) {
+        ctx.save();
+        ctx.fillStyle = cssVar('--md-muted');
+        ctx.font = `italic 14px ${PLOT_FONT}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('Press Play to record the order-parameter history.', width / 2, height / 2);
+        ctx.restore();
+        return;
+      }
+      const tMin = h[0].t;
+      const tMax = Math.max(tMin + 1e-9, h[h.length - 1].t);
+      const xMap = t => margin + ((t - tMin) / (tMax - tMin)) * plotW;
+      const yMap = s => height - margin - Math.max(0, Math.min(1, s)) * plotH;
+
+      function line(key, color) {
+        ctx.beginPath();
+        for (let i = 0; i < h.length; i++) {
+          const x = xMap(h[i].t);
+          const y = yMap(h[i][key]);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+      line('sp', cssVar('--md-primary'));
+      line('sm', cssVar('--md-secondary'));
+
+      // serif legend + window label
+      ctx.save();
+      ctx.font = `italic 15px ${PLOT_FONT}`;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = cssVar('--md-primary');
+      ctx.fillText('S+', margin + 12, margin + 15);
+      ctx.fillStyle = cssVar('--md-secondary');
+      ctx.fillText('S−', margin + 52, margin + 15);
+      ctx.fillStyle = cssVar('--md-muted');
+      ctx.textAlign = 'right';
+      ctx.font = `13px ${PLOT_FONT}`;
+      ctx.fillText(`window: ${(tMax - tMin).toFixed(1)}`, width - margin, margin + 15);
+      ctx.restore();
+    }
+
+    function drawAll() {
+      drawScatter();
+      drawSeries();
+    }
+
+    function animate() {
+      if (state.running) {
+        for (let s = 0; s < state.stepsPerFrame; s++) eulerStep();
+        pushHistory();
+        updateReadouts();
+        drawAll();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    /* ---------- control wiring ---------- */
+    function setJ(value) {
+      state.J = Number(value);
+      els.jSlider.value = state.J;
+      els.jValue.textContent = state.J.toFixed(1);
+      drawAll();
+    }
+    function setK(value) {
+      state.K = Number(value);
+      els.kSlider.value = state.K;
+      els.kValue.textContent = state.K.toFixed(1);
+      drawAll();
+    }
+
+    function setActiveTab(which) {
+      const showSim = which === 'sim';
+      els.simTab.classList.toggle('hidden', !showSim);
+      els.modelTab.classList.toggle('hidden', showSim);
+      els.simTabBtn.classList.toggle('active', showSim);
+      els.modelTabBtn.classList.toggle('active', !showSim);
+      if (showSim) setTimeout(drawAll, 30);
+      if (!showSim && window.MathJax?.typesetPromise) MathJax.typesetPromise([els.modelTab]).catch(() => {});
+    }
+
+    els.playPause.addEventListener('click', () => {
+      state.running = !state.running;
+      updateRunUI();
+      drawAll();
+    });
+    els.reset.addEventListener('click', () => initialiseSystem(state.N));
+    els.clearHistory.addEventListener('click', () => {
+      state.history = [];
+      computeOrderParameters();
+      pushHistory();
+      drawAll();
+    });
+    els.updateN.addEventListener('click', () => initialiseSystem(els.nInput.value));
+    els.nInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') initialiseSystem(els.nInput.value); });
+
+    els.jSlider.addEventListener('input', ev => setJ(ev.target.value));
+    els.kSlider.addEventListener('input', ev => setK(ev.target.value));
+    els.sizeSlider.addEventListener('input', ev => {
+      state.pointSize = Number(ev.target.value);
+      els.sizeValue.textContent = state.pointSize.toFixed(1);
+      drawScatter();
+    });
+    els.dtSlider.addEventListener('input', ev => {
+      state.dt = Number(ev.target.value);
+      els.dtValue.textContent = state.dt.toFixed(3);
+    });
+    els.speedSlider.addEventListener('input', ev => {
+      state.stepsPerFrame = Number(ev.target.value);
+      els.speedValue.textContent = String(state.stepsPerFrame);
+    });
+
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const presets = { as: [12, -8], pw: [12, 0.5], bm: [12, 10] };
+        const [j, k] = presets[btn.dataset.preset];
+        setJ(j); setK(k);
+      });
+    });
+
+    els.themeToggle.addEventListener('click', () => {
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(theme);
+    });
+    els.simTabBtn.addEventListener('click', () => setActiveTab('sim'));
+    els.modelTabBtn.addEventListener('click', () => setActiveTab('model'));
+
+    window.addEventListener('resize', drawAll);
+    const observer = new ResizeObserver(() => drawAll());
+    observer.observe(els.scatter);
+    observer.observe(els.series);
+
+    /* ---------- boot ---------- */
+    setTheme('light');
+    setJ(state.J);
+    setK(state.K);
+    els.sizeValue.textContent = state.pointSize.toFixed(1);
+    initialiseSystem(250);
+    animate();
+  </script>
+</body>
+</html>
