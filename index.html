@@ -98,9 +98,6 @@ h1,h2,h3,p{margin:0}
 /* entrance */
 @keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes lineUp{from{transform:translateY(105%)}to{transform:none}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes breathe{0%,100%{transform:translateX(var(--r)) scale(1)}50%{transform:translateX(calc(var(--r) + 14px)) scale(1.35)}}
-@keyframes ringPulse{0%{transform:scale(.92);opacity:0}40%{opacity:.55}100%{transform:scale(1.25);opacity:0}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 .in{animation:rise .9s cubic-bezier(.2,0,0,1) both}
 .d2{animation-delay:.18s}.d3{animation-delay:.3s}.d4{animation-delay:.42s}
@@ -120,15 +117,8 @@ h1,h2,h3,p{margin:0}
 .name{font-size:76px;line-height:1.02;font-weight:500;letter-spacing:-.035em;font-variation-settings:'opsz' 144}
 .lead{max-width:560px;font-size:20px;line-height:1.55;color:var(--on-surface-variant)}
 .row{display:flex;flex-wrap:wrap;gap:12px}
-.stage{position:relative;width:500px;height:500px;margin:0 auto}
-.ring{position:absolute;border-radius:50%;border:1px dashed var(--outline-variant)}
-.core{position:absolute;inset:118px;border-radius:50%;background:var(--surface-container)}
-.orbit{position:absolute;left:50%;top:50%;width:0;height:0;animation:spin linear infinite}
-.orbit.rev{animation-direction:reverse}
-.dot{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;transform:translateX(var(--r));animation:breathe ease-in-out infinite}
-.portrait{position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%}
-.portrait img{width:220px;height:220px;border-radius:50%;object-fit:cover;border:6px solid var(--bg)}
-.pulse{position:absolute;inset:0;border-radius:50%;border:2px solid var(--primary);animation:ringPulse 3.6s cubic-bezier(.2,0,0,1) infinite}
+.portrait{width:340px;height:340px;margin:0 auto;padding:7px;border-radius:50%;background:conic-gradient(from -45deg,#4285F4 0 25%,#34A853 0 50%,#FBBC04 0 75%,#EA4335 0)}
+.portrait img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:7px solid var(--bg)}
 
 /* cards */
 .tile{padding:24px;border-radius:24px;background:var(--surface-container);display:flex;flex-direction:column;gap:8px}
@@ -211,9 +201,7 @@ footer nav{display:flex;flex-wrap:wrap;gap:20px}
 
 @media (max-width:960px){
   .hero-grid{grid-template-columns:minmax(0,1fr)}
-  .stage{width:340px;height:340px}
-  .stage .ring.r1{inset:48px}.stage .ring.r2{inset:15px}.core{inset:80px}
-  .portrait,.portrait img{width:150px;height:150px}.portrait{margin:-75px 0 0 -75px}
+  .portrait{width:240px;height:240px;padding:5px}.portrait img{border-width:5px}
   .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .grid2{grid-template-columns:minmax(0,1fr)}
   .nav{display:none}
@@ -299,14 +287,8 @@ footer nav{display:flex;flex-wrap:wrap;gap:20px}
       </div>
 
       <div class="in d2">
-        <div class="stage" id="stage" role="img" aria-label="Portrait of Senthamizhan Rajendran surrounded by animated swarmalators">
-          <div class="ring r1" style="inset:70px"></div>
-          <div class="ring r2" style="inset:22px"></div>
-          <div class="core"></div>
-          <div class="portrait">
-            <div class="pulse"></div>
-            <img src="assets/photo.jpg" alt="Senthamizhan Rajendran">
-          </div>
+        <div class="portrait">
+          <img src="assets/photo.jpg" alt="Senthamizhan Rajendran">
         </div>
       </div>
     </div>
@@ -574,30 +556,6 @@ footer nav{display:flex;flex-wrap:wrap;gap:20px}
     try { localStorage.setItem("cv-theme", root.dataset.theme); } catch (e) {}
     label();
   });
-
-  // swarmalators: colour = phase, three orbital shells, mixed directions
-  var stage = document.getElementById("stage");
-  var small = matchMedia("(max-width: 960px)").matches;
-  var hues = ["#4285F4", "#EA4335", "#FBBC04", "#34A853"];
-  var radii = small ? [100, 132, 160] : [148, 196, 236];
-  var portrait = stage.querySelector(".portrait");
-  for (var i = 0; i < 18; i++) {
-    var shell = i % 3;
-    var dur = [26, 34, 44][shell] + (i % 5) * 2;
-    var phase = (i * 0.618) % 1;
-    var orbit = document.createElement("div");
-    orbit.className = shell === 1 ? "orbit rev" : "orbit";
-    orbit.style.animationDuration = dur + "s";
-    orbit.style.animationDelay = (-phase * dur).toFixed(1) + "s";
-    var dot = document.createElement("div");
-    dot.className = "dot";
-    dot.style.setProperty("--r", radii[shell] + "px");
-    dot.style.background = hues[Math.floor(phase * 4) % 4];
-    dot.style.animationDuration = (3.2 + (i % 4) * 0.7).toFixed(2) + "s";
-    dot.style.animationDelay = (-phase * dur).toFixed(1) + "s";
-    orbit.appendChild(dot);
-    stage.insertBefore(orbit, portrait);
-  }
 
   // publication filter
   var chips = document.querySelectorAll(".chipbtn");
