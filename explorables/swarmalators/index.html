@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swarmalators with Second-Order Harmonics · Explorable</title>
+<meta name="description" content="Live, interactive simulation of two-dimensional swarmalators with second-order harmonic phase coupling: tune J and K and watch the seven collective states and their order parameters.">
+<meta property="og:title" content="Swarmalators with second-order harmonics · Explorable">
+<meta property="og:image" content="https://senthamizhanr.github.io/assets/photo.jpg">
+<link rel="icon" href="../../assets/photo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Google+Sans+Code:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("cv-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="stylesheet" href="../x.css">
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="../../index.html">
+      <img src="../../assets/photo.jpg" alt="" width="42" height="42">
+      <span>Senthamizhan R.</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="../../index.html#research">Research</a>
+      <a href="../../index.html#publications">Publications</a>
+      <a href="../index.html" aria-current="page">Explorables</a>
+      <a href="../../index.html#contact">Contact</a>
+    </nav>
+    <div class="actions">
+      <button class="btn icon-btn" type="button" id="themeBtn" aria-label="Switch theme">
+        <svg class="theme-light" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <svg class="theme-dark" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <nav class="crumbs in" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span>/</span><a href="../index.html">Explorables</a><span>/</span><span>Swarmalators</span></nav>
+    <span class="eyebrow in">Explorable · Physical Review E 109, 064303 (2024)</span>
+    <h1 class="h1 in">Swarmalators with second-order harmonics</h1>
+    <p class="lead in d2">Swarmalators move in the plane and carry an internal phase. Their phases attract their positions, and their positions shape how their phases synchronise. With the second harmonic <span data-tex="\sin 2(\theta_j-\theta_i)"></span>, agents can lock half a cycle apart, which produces seven collective states. Pick a state, or drag <span data-tex="J"></span> and <span data-tex="K"></span> and watch the swarm reorganise.</p>
+  </section>
+
+  <section class="wrap" id="labSec">
+    <div class="lab">
+      <div class="stack" style="gap:16px;min-width:0">
+        <div class="pane in d2">
+          <div class="pane-head"><h2>Live state</h2><span class="mono" id="clock">t = 0</span></div>
+          <canvas class="cv cv-stage" id="cvState" aria-label="Swarmalator positions coloured by phase"></canvas>
+          <div class="legend"><span>Each dot is one swarmalator at its position <span data-tex="\mathbf{x}_i"></span>, coloured by its phase <span data-tex="\theta_i"></span> (wheel, lower right).</span></div>
+        </div>
+        <div class="stats" aria-live="off">
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-blue)"></i>s₁₊</span><b id="o1p">0.000</b></div>
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-red)"></i>s₁₋</span><b id="o1m">0.000</b></div>
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-green)"></i>s₂₊</span><b id="o2p">0.000</b></div>
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-yellow)"></i>s₂₋</span><b id="o2m">0.000</b></div>
+        </div>
+      </div>
+
+      <aside class="controls in d3" aria-label="Parameters">
+        <h2>Parameters</h2>
+        <div class="ctl">
+          <span class="label" style="text-transform:none;letter-spacing:0;font-size:14px">States from the paper</span>
+          <div class="chips" id="presets"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="J">Spatial coupling J</label><output id="Jv">0.10</output></div>
+          <input type="range" id="J" min="-1" max="1" step="0.01" value="0.1">
+          <small>How strongly like phases attract in space (J &gt; 0) or repel (J &lt; 0).</small>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="K">Phase coupling K</label><output id="Kv">1.00</output></div>
+          <input type="range" id="K" min="-1.5" max="1.5" step="0.01" value="1">
+          <small>Nearby agents pull their phases together (K &gt; 0) or push them apart (K &lt; 0).</small>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><span style="font-size:15px;font-weight:500">Harmonic h</span>
+            <div class="seg" role="group" aria-label="Harmonic order"><button type="button" data-h="1" aria-pressed="false">1</button><button type="button" data-h="2" aria-pressed="true">2</button></div>
+          </div>
+          <small>h = 2 is the model of the paper; h = 1 recovers O'Keeffe's original swarmalators for comparison.</small>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="N">Swarmalators N</label>
+            <select id="N"><option>150</option><option selected>300</option><option>500</option></select>
+          </div>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="spd">Speed</label><output id="spdv">2×</output></div>
+          <input type="range" id="spd" min="1" max="8" step="1" value="2">
+        </div>
+        <div class="divider"></div>
+        <div class="btnrow">
+          <button class="btn filled sm" type="button" id="play"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>Pause</span></button>
+          <button class="btn tonal" type="button" id="reseed">New start</button>
+          <button class="btn tonal" type="button" id="restart">Restart</button>
+        </div>
+        <small class="muted" style="font-size:13px;line-height:1.5">Moving a slider keeps the current configuration, so you can follow a state as it deforms. A preset starts from fresh random positions in (−2, 2)² and random phases.</small>
+      </aside>
+    </div>
+
+
+    <div class="lab" style="margin-top:16px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+      <div class="pane">
+        <div class="pane-head"><h2>Order parameters</h2><span class="mono" id="speed">mean speed 0.000</span></div>
+        <canvas class="cv cv-plot" id="cvSeries" aria-label="Order parameters over time"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--g-blue)"></i>s₁₊</span><span><i style="background:var(--g-red)"></i>s₁₋</span>
+          <span><i style="background:var(--g-green)"></i>s₂₊</span><span><i style="background:var(--g-yellow)"></i>s₂₋</span>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-head"><h2>Phase vs. spatial angle</h2></div>
+        <canvas class="cv cv-square" id="cvPhi" aria-label="Phase against spatial angle"></canvas>
+        <div class="legend"><span>A diagonal band means the phase follows the angle around the swarm: a phase wave.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec">
+    <div class="stack" style="gap:16px;max-width:820px">
+      <span class="eyebrow">The model</span>
+      <h2 class="h2">What is being simulated</h2>
+    </div>
+    <div class="eqbox" style="margin-top:28px">
+      <div data-tex="\dot{\mathbf{x}}_i=\frac{1}{N}\sum_{j\neq i}\left[\frac{\mathbf{x}_j-\mathbf{x}_i}{|\mathbf{x}_j-\mathbf{x}_i|}\bigl(1+J\cos(\theta_j-\theta_i)\bigr)-\frac{\mathbf{x}_j-\mathbf{x}_i}{|\mathbf{x}_j-\mathbf{x}_i|^{2}}\right]" data-display></div>
+      <div data-tex="\dot{\theta}_i=\frac{K}{N}\sum_{j\neq i}\frac{\sin\bigl(h(\theta_j-\theta_i)\bigr)}{|\mathbf{x}_j-\mathbf{x}_i|},\qquad h=2" data-display></div>
+      <div data-tex="s_{m\pm}=\Bigl|\frac{1}{N}\sum_{j=1}^{N}e^{\,i(\phi_j\pm m\theta_j)}\Bigr|,\qquad m=1,2" data-display></div>
+    </div>
+    <div class="prose" style="margin-top:24px">
+      <p>The first equation is O'Keeffe's swarmalator model: a long-range attraction that is stronger between agents with similar phases when <strong>J &gt; 0</strong>, and a short-range repulsion that keeps them apart. The second equation couples the phases through the <strong>second harmonic</strong>, weighted by distance. Because <span data-tex="\sin 2\Delta\theta"></span> vanishes at both <span data-tex="\Delta\theta=0"></span> and <span data-tex="\Delta\theta=\pi"></span>, agents can lock in anti-phase as well as in phase.</p>
+      <p>The order parameters measure how the phase <span data-tex="\theta_j"></span> is correlated with the spatial angle <span data-tex="\phi_j"></span>, taken here around the centroid of the swarm. <strong>s₁±</strong> picks up phase waves, which wind once around the swarm. <strong>s₂±</strong> picks up the doubled winding that π-locked groups produce. The browser integrates the equations with fourth-order Runge–Kutta (Δt = 0.05), with natural frequencies and self-propulsion set to zero, as in the paper.</p>
+    </div>
+  </section>
+
+  <section class="wrap sec">
+    <div class="stack" style="gap:16px;max-width:820px">
+      <span class="eyebrow">Collective states</span>
+      <h2 class="h2">Seven states to find</h2>
+      <p class="prose">Click a card to load that state. Static states settle in a few hundred time units. Active states keep moving indefinitely.</p>
+    </div>
+    <div class="states" id="stateCards"></div>
+    <div class="row" style="margin-top:32px">
+      <a class="btn filled sm" href="https://doi.org/10.1103/PhysRevE.109.064303">Read the paper <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <a class="btn outlined sm" href="../biharmonic-kuramoto/index.html">Next: biharmonic Kuramoto <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>© 2026 R. Senthamizhan · Thanjavur, India</span>
+  <nav aria-label="Pages"><a href="../../index.html">Home</a><a href="../index.html">All explorables</a><a href="https://github.com/senthamizhanR">GitHub</a></nav>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="../x.js"></script>
+<script src="../swarm.js"></script>
+<script>
+(function () {
+  "use strict";
+  X.initTheme();
+  window.addEventListener("load", X.tex);
+
+  var STATES = [
+    { id: "CPIS", name: "Clustered π-state", J: 0.1, K: 1, cls: "c-primary",
+      text: "Two compact clusters whose phases differ by π. The second harmonic makes anti-phase locking stable." },
+    { id: "MPIS", name: "Mixed π-state", J: -0.1, K: 0.1, cls: "c-primary",
+      text: "The same two anti-phase populations, but mixed together in a single disk because J < 0." },
+    { id: "SPW", name: "Static phase wave", J: 1, K: 0, cls: "c-secondary",
+      text: "A frozen ring in which phase increases with angle. It exists only on the line K = 0." },
+    { id: "SPPW", name: "Splintered phase wave", J: 1, K: -0.1, cls: "c-secondary",
+      text: "The ring breaks into confined groups. Each group has its own band of phases and jiggles in place." },
+    { id: "APW", name: "Active phase wave", J: 1, K: -0.75, cls: "c-secondary",
+      text: "An annulus that keeps phase–position correlation while agents counter-rotate around it." },
+    { id: "AAS", name: "Active asynchronous state", J: 0.1, K: -1, cls: "c-error",
+      text: "A disk that keeps churning: agents never stop moving and phases never lock into clusters. It is absent from the h = 1 model." },
+    { id: "SAS", name: "Static asynchronous state", J: -0.1, K: -0.75, cls: "c-tertiary",
+      text: "A frozen disk with random phases. Nothing moves and nothing is ordered." }
+  ];
+
+  var sim = new Swarm(300, 7);
+  var seed = 7, running = !X.reduced, stepsPerFrame = 2, DT = 0.05, current = "CPIS";
+  var series = X.series(["s1p", "s1m", "s2p", "s2m"], 700);
+  var cState = X.canvas(document.getElementById("cvState"));
+  var cSeries = X.canvas(document.getElementById("cvSeries"));
+  var cPhi = X.canvas(document.getElementById("cvPhi"));
+  var view = { cx: 0, cy: 0, R: 2.5 };
+  var $ = function (id) { return document.getElementById(id); };
+  var Js = $("J"), Ks = $("K"), Jv = $("Jv"), Kv = $("Kv");
+
+  /* presets: chips + cards */
+  var chipBox = $("presets"), cardBox = $("stateCards");
+  STATES.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chipbtn"; b.textContent = s.id; b.dataset.id = s.id;
+    b.title = s.name + " (J = " + s.J + ", K = " + s.K + ")";
+    b.addEventListener("click", function () { load(s.id); });
+    chipBox.appendChild(b);
+
+    var c = document.createElement("button");
+    c.type = "button"; c.className = "st card";
+    c.innerHTML = '<span class="badge ' + s.cls + '">' + s.id + '</span><h3>' + s.name + '</h3><p>' + s.text +
+      '</p><span class="mono">J = ' + s.J + ' · K = ' + s.K + '</span>';
+    c.addEventListener("click", function () {
+      load(s.id);
+      document.querySelector(".lab").scrollIntoView({ behavior: X.reduced ? "auto" : "smooth", block: "start" });
+    });
+    cardBox.appendChild(c);
+  });
+
+  function markPreset() {
+    chipBox.querySelectorAll(".chipbtn").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === current ? "true" : "false"); });
+  }
+  function setSliders() {
+    Js.value = sim.J; Ks.value = sim.K;
+    Jv.textContent = sim.J.toFixed(2); Kv.textContent = sim.K.toFixed(2);
+  }
+  function restart() { sim.reset(seed); series.clear(); view.R = 2.5; view.cx = 0; view.cy = 0; }
+  function load(id) {
+    var s = STATES.filter(function (q) { return q.id === id; })[0];
+    sim.J = s.J; sim.K = s.K; current = id;
+    if (sim.h !== 2) setH(2);
+    setSliders(); markPreset(); restart(); kick();
+  }
+  function setH(h) {
+    sim.h = h;
+    document.querySelectorAll(".seg button").forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.h === h ? "true" : "false"); });
+  }
+
+  Js.addEventListener("input", function () { sim.J = +Js.value; Jv.textContent = sim.J.toFixed(2); current = null; markPreset(); kick(); });
+  Ks.addEventListener("input", function () { sim.K = +Ks.value; Kv.textContent = sim.K.toFixed(2); current = null; markPreset(); kick(); });
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () { setH(+b.dataset.h); current = null; markPreset(); kick(); });
+  });
+  $("N").addEventListener("change", function () { sim.resize(+this.value, seed); series.clear(); kick(); });
+  $("spd").addEventListener("input", function () { stepsPerFrame = +this.value; $("spdv").textContent = stepsPerFrame + "×"; });
+  $("reseed").addEventListener("click", function () { seed = (seed * 9301 + 49297) % 233280 + 1; restart(); kick(); });
+  $("restart").addEventListener("click", function () { restart(); kick(); });
+  var playBtn = $("play");
+  function syncPlay() {
+    playBtn.querySelector("span").textContent = running ? "Pause" : "Play";
+    playBtn.querySelector("svg").innerHTML = running
+      ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
+      : '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z"/>';
+  }
+  playBtn.addEventListener("click", function () { running = !running; syncPlay(); kick(); });
+
+  /* drawing */
+  var lut = X.phaseLUT(360);
+  X.onTheme(function () { lut = X.phaseLUT(360); draw(); });
+  function col(th) {
+    var d = Math.floor(((th + Math.PI) / (2 * Math.PI)) * 360 + 180) % 360;
+    return lut[(d + 360) % 360];
+  }
+
+  function drawState(o) {
+    var c = cState, ctx = c.ctx, w = c.w, h = c.h, N = sim.N, x = sim.x, y = sim.y, th = sim.th, i;
+    // fit the view to the swarm (95th percentile radius), smoothed
+    var d = new Float64Array(N);
+    for (i = 0; i < N; i++) d[i] = Math.hypot(x[i] - o.cx, y[i] - o.cy);
+    d.sort();
+    var R = Math.max(d[Math.floor(0.97 * (N - 1))] * 1.18, 0.4);
+    var a = series.t.length < 3 ? 1 : 0.08;
+    view.cx += (o.cx - view.cx) * a; view.cy += (o.cy - view.cy) * a; view.R += (R - view.R) * a;
+    var S = Math.min(w, h) / 2 / view.R, X0 = w / 2, Y0 = h / 2;
+    ctx.clearRect(0, 0, w, h);
+    // faint guide rings
+    ctx.strokeStyle = X.tok["outline-variant"]; ctx.lineWidth = 1; ctx.globalAlpha = .55;
+    ctx.setLineDash([3, 5]);
+    for (var q = 1; q <= 2; q++) { ctx.beginPath(); ctx.arc(X0, Y0, Math.min(w, h) * q / 6.2, 0, 2 * Math.PI); ctx.stroke(); }
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+    var r = N > 400 ? 2.6 : N > 200 ? 3.2 : 4;
+    for (i = 0; i < N; i++) {
+      ctx.fillStyle = col(th[i]);
+      ctx.beginPath();
+      ctx.arc(X0 + (x[i] - view.cx) * S, Y0 - (y[i] - view.cy) * S, r, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    // phase wheel
+    var wr = Math.max(16, Math.min(26, w * 0.04)), wx = w - wr - 18, wy = h - wr - 18;
+    for (var k = 0; k < 72; k++) {
+      var a0 = k / 72 * 2 * Math.PI, a1 = (k + 1.2) / 72 * 2 * Math.PI;
+      ctx.strokeStyle = X.phaseColor(a0); ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.arc(wx, wy, wr, -a1, -a0); ctx.stroke();
+    }
+    ctx.fillStyle = X.tok["on-surface-variant"]; ctx.font = "13px 'Roboto Flex', system-ui, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("θ", wx, wy);
+  }
+
+  function drawPhi(o) {
+    var c = cPhi, ctx = c.ctx;
+    ctx.clearRect(0, 0, c.w, c.h);
+    var f = X.frame(c, { l: 44, r: 12, t: 12, b: 40 }, "spatial angle φ", "phase θ",
+      [[0, "−π"], [.5, "0"], [1, "π"]], [[0, "−π"], [.5, "0"], [1, "π"]]);
+    var N = sim.N, rr = N > 400 ? 1.8 : 2.4;
+    for (var i = 0; i < N; i++) {
+      var ph = Math.atan2(sim.y[i] - o.cy, sim.x[i] - o.cx);
+      ctx.fillStyle = col(sim.th[i]);
+      ctx.beginPath();
+      ctx.arc(f.x0 + f.pw * (ph + Math.PI) / (2 * Math.PI), f.y0 + f.ph * (1 - (sim.th[i] + Math.PI) / (2 * Math.PI)), rr, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  var lastO = sim.order();
+  function draw() {
+    drawState(lastO);
+    drawPhi(lastO);
+    X.plotSeries(cSeries, series, [X.tok["g-blue"], X.tok["g-red"], X.tok["g-green"], X.tok["g-yellow"]]);
+  }
+
+  var frame = 0;
+  function tick() {
+    if (running) for (var s = 0; s < stepsPerFrame; s++) sim.step(DT);
+    lastO = sim.order();
+    if (running || !series.t.length) series.push(sim.t, { s1p: lastO.s1p, s1m: lastO.s1m, s2p: lastO.s2p, s2m: lastO.s2m });
+    draw();
+    if (frame++ % 6 === 0) {
+      $("o1p").textContent = lastO.s1p.toFixed(3); $("o1m").textContent = lastO.s1m.toFixed(3);
+      $("o2p").textContent = lastO.s2p.toFixed(3); $("o2m").textContent = lastO.s2m.toFixed(3);
+      $("clock").textContent = "t = " + sim.t.toFixed(1) + " · N = " + sim.N;
+      $("speed").textContent = "mean speed " + sim.speed.toFixed(4);
+    }
+  }
+  var lp = X.loop(document.getElementById("labSec"), tick);
+  function kick() { lp.kick(); }
+
+  syncPlay();
+  load("CPIS");
+})();
+</script>
+</body>

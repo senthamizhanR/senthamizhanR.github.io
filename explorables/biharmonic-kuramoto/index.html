@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biharmonic Frequency-Weighted Kuramoto · Explorable</title>
+<meta name="description" content="Live, interactive simulation of frequency-weighted Kuramoto oscillators with biharmonic coupling: tune K1 and K2 and watch the incoherent, antipodal multibranch and symmetry-broken multibranch states form.">
+<meta property="og:title" content="Biharmonic frequency-weighted Kuramoto · Explorable">
+<meta property="og:image" content="https://senthamizhanr.github.io/assets/photo.jpg">
+<link rel="icon" href="../../assets/photo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Google+Sans+Code:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("cv-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="stylesheet" href="../x.css">
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="../../index.html">
+      <img src="../../assets/photo.jpg" alt="" width="42" height="42">
+      <span>Senthamizhan R.</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="../../index.html#research">Research</a>
+      <a href="../../index.html#publications">Publications</a>
+      <a href="../index.html" aria-current="page">Explorables</a>
+      <a href="../../index.html#contact">Contact</a>
+    </nav>
+    <div class="actions">
+      <button class="btn icon-btn" type="button" id="themeBtn" aria-label="Switch theme">
+        <svg class="theme-light" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <svg class="theme-dark" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <nav class="crumbs in" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span>/</span><a href="../index.html">Explorables</a><span>/</span><span>Biharmonic Kuramoto</span></nav>
+    <span class="eyebrow in">Explorable · under review at Chaos (arXiv 2607.27642)</span>
+    <h1 class="h1 in">Frequency-weighted Kuramoto oscillators with biharmonic coupling</h1>
+    <p class="lead in d2">Each oscillator responds to the mean field in proportion to its own speed <span data-tex="|\omega_i|"></span>, through a first harmonic <span data-tex="K_1"></span> and a second harmonic <span data-tex="K_2"></span>. That is enough to split a single-peaked population into two or four frequency-sorted clusters. Pick a state, or move through the <span data-tex="(K_2, K_1)"></span> plane and watch the clusters form and break.</p>
+  </section>
+
+  <section class="wrap" id="labSec">
+    <div class="lab">
+      <div class="stack" style="gap:16px;min-width:0">
+        <div class="pane in d2">
+          <div class="pane-head"><h2>Live state</h2><span class="mono" id="clock">t = 0</span></div>
+          <canvas class="cv cv-stage" id="cvRing" aria-label="Oscillator phases on the circle"></canvas>
+          <div class="legend">
+            <span><i class="dotk" style="background:var(--g-blue)"></i>ω &lt; 0</span>
+            <span><i class="dotk" style="background:var(--g-red)"></i>ω &gt; 0</span>
+            <span><i style="background:var(--on-surface)"></i>r₁ arrow at ψ₁</span>
+            <span><i style="background:var(--g-green)"></i>r₂ axis at ψ₂/2</span>
+            <span>Each oscillator sits at angle θᵢ. Its radius orders it by ω, with the most negative innermost.</span>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-blue)"></i>r₁</span><b id="or1">0.000</b></div>
+          <div class="stat"><span class="label"><i class="sw" style="background:var(--g-green)"></i>r₂</span><b id="or2">0.000</b></div>
+          <div class="stat"><span class="label">Δθ between clusters</span><b id="odt">–</b></div>
+          <div class="stat"><span class="label">Looks like</span><span class="state-chip c-secondary" id="ostate" style="align-self:flex-start;margin-top:4px"><i></i>–</span><small class="muted" id="ostateName" style="font-size:13px;line-height:1.4"></small></div>
+        </div>
+      </div>
+
+      <aside class="controls in d3" aria-label="Parameters">
+        <h2>Parameters</h2>
+        <div class="ctl">
+          <span class="label" style="text-transform:none;letter-spacing:0;font-size:14px">States from the paper</span>
+          <div class="chips" id="presets"></div>
+        </div>
+        <div class="ctl">
+          <span class="label" style="text-transform:none;letter-spacing:0;font-size:14px">Coupling plane: click or drag to set (K₂, K₁)</span>
+          <canvas class="cv cv-square" id="cvPlane" style="border-radius:16px;background:var(--surface);cursor:crosshair;touch-action:none" aria-label="Coupling parameter plane, click to choose K2 and K1"></canvas>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="K1">First harmonic K₁</label><output id="K1v">-5.0</output></div>
+          <input type="range" id="K1" min="-10" max="10" step="0.1" value="-5">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="K2">Second harmonic K₂</label><output id="K2v">7.0</output></div>
+          <input type="range" id="K2" min="-10" max="10" step="0.1" value="7">
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="N">Oscillators N</label>
+            <select id="N"><option>500</option><option selected>1000</option><option>2000</option></select>
+          </div>
+        </div>
+        <div class="ctl">
+          <div class="ctl-top"><label for="spd">Speed</label><output id="spdv">3×</output></div>
+          <input type="range" id="spd" min="1" max="8" step="1" value="3">
+        </div>
+        <div class="divider"></div>
+        <div class="btnrow">
+          <button class="btn filled sm" type="button" id="play"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"></svg><span>Pause</span></button>
+          <button class="btn tonal" type="button" id="scramble">Randomise</button>
+          <button class="btn tonal" type="button" id="sync">Synchronise</button>
+        </div>
+        <small class="muted" style="font-size:13px;line-height:1.5">Sliders and the plane keep the current phases, so sweeping K up and back down shows the hysteresis. Use <em>Randomise</em> or <em>Synchronise</em> to restart from either extreme.</small>
+      </aside>
+    </div>
+
+
+    <div class="lab" style="margin-top:16px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+      <div class="pane">
+        <div class="pane-head"><h2>Order parameters</h2><span class="mono" id="stepinfo"></span></div>
+        <canvas class="cv cv-plot" id="cvSeries" aria-label="Order parameters over time"></canvas>
+        <div class="legend"><span><i style="background:var(--g-blue)"></i>r₁ (first harmonic)</span><span><i style="background:var(--g-green)"></i>r₂ (second harmonic)</span></div>
+      </div>
+      <div class="pane">
+        <div class="pane-head"><h2>Phase vs. frequency</h2></div>
+        <canvas class="cv cv-square" id="cvTW" aria-label="Phase against natural frequency"></canvas>
+        <div class="legend"><span>Locked oscillators form horizontal branches. Each branch is a cluster.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec">
+    <div class="stack" style="gap:16px;max-width:820px">
+      <span class="eyebrow">The model</span>
+      <h2 class="h2">What is being simulated</h2>
+    </div>
+    <div class="eqbox" style="margin-top:28px">
+      <div data-tex="\dot{\theta}_i=\omega_i+\frac{|\omega_i|}{N}\sum_{j=1}^{N}\bigl[K_1\sin(\theta_j-\theta_i)+K_2\sin 2(\theta_j-\theta_i)\bigr]" data-display></div>
+      <div data-tex="=\;\omega_i+|\omega_i|\bigl[K_1 r_1\sin(\psi_1-\theta_i)+K_2 r_2\sin(\psi_2-2\theta_i)\bigr],\qquad r_m e^{i\psi_m}=\frac{1}{N}\sum_{j=1}^{N}e^{\,im\theta_j}" data-display></div>
+      <div data-tex="g(\omega)=\frac{1}{\pi}\,\frac{1}{1+\omega^2}" data-display></div>
+    </div>
+    <div class="prose" style="margin-top:24px">
+      <p>The <strong>frequency weighting</strong> <span data-tex="|\omega_i|"></span> makes fast oscillators respond more strongly to the mean field. The <strong>second harmonic</strong> has period π, so it can lock oscillators half a cycle apart. The two order parameters capture the difference: <span data-tex="r_1"></span> measures ordinary coherence, and <span data-tex="r_2"></span> detects π-periodic clustering, which can be close to 1 even when <span data-tex="r_1"></span> is zero.</p>
+      <p>The incoherent state loses linear stability at <strong>K₁ = 4</strong> or <strong>K₂ = 4</strong> (dashed lines on the plane), and the two harmonics decouple at linear order. In the antipodal state the cluster amplitude follows <span data-tex="r_2^4-r_2^2+1/K_2^2=0"></span>. The browser uses fourth-order Runge–Kutta with a step set by the fastest rate in the system. Natural frequencies sit on a Lorentzian quantile grid with the outer 1% of each tail left out (|ω| ≤ 31.8), so the stiffest oscillators stay tractable. The paper's runs use N = 2000 and an adaptive integrator.</p>
+      <p>The two coupling axes on their own were studied before: K₂ = 0 by Hu et al. (Sci. Rep. 2014) and K₁ = 0 by Tang, Lü &amp; Xu (J. Phys. A 2021). The paper maps the interior of the plane, where the two harmonics compete.</p>
+    </div>
+  </section>
+
+  <section class="wrap sec">
+    <div class="stack" style="gap:16px;max-width:820px">
+      <span class="eyebrow">Collective states</span>
+      <h2 class="h2">Three states, two order parameters</h2>
+      <p class="prose">Click a card to load that state from random phases.</p>
+    </div>
+    <div class="states" id="stateCards"></div>
+    <div class="row" style="margin-top:32px">
+      <a class="btn filled sm" href="https://arxiv.org/abs/2607.27642">Read the preprint <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <a class="btn outlined sm" href="../swarmalators/index.html">Previous: swarmalators <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>© 2026 R. Senthamizhan · Thanjavur, India</span>
+  <nav aria-label="Pages"><a href="../../index.html">Home</a><a href="../index.html">All explorables</a><a href="https://github.com/senthamizhanR">GitHub</a></nav>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="../x.js"></script>
+<script src="../kuramoto.js"></script>
+<script>
+(function () {
+  "use strict";
+  X.initTheme();
+  window.addEventListener("load", X.tex);
+
+  var STATES = [
+    { id: "IC", name: "Incoherent state", K1: -5, K2: -5, cls: "c-tertiary",
+      text: "Phases stay spread around the circle. r₁ and r₂ only show finite-size noise of order 1/√N." },
+    { id: "APMS", name: "Antipodal multibranch state", K1: -5, K2: 7, cls: "c-primary",
+      text: "The second harmonic dominates. There are two clusters exactly π apart, each split by the sign of ω into four frequency-sorted branches. r₂ ≈ 1 while r₁ ≈ 0." },
+    { id: "SBMS", name: "Symmetry-broken multibranch state", K1: 5, K2: -5, cls: "c-secondary",
+      text: "The first harmonic wins. There are two locked clusters, but their separation Δθ moves away from π, so r₁ becomes finite." }
+  ];
+
+  var sim = new FWK(1000, 3);
+  var seed = 3, running = !X.reduced, speed = 3, current = "APMS";
+  var series = X.series(["r1", "r2"], 700);
+  var cRing = X.canvas(document.getElementById("cvRing"));
+  var cSeries = X.canvas(document.getElementById("cvSeries"));
+  var cTW = X.canvas(document.getElementById("cvTW"));
+  var cPlane = X.canvas(document.getElementById("cvPlane"));
+  var $ = function (id) { return document.getElementById(id); };
+  var K1s = $("K1"), K2s = $("K2");
+
+  var chipBox = $("presets"), cardBox = $("stateCards");
+  STATES.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chipbtn"; b.textContent = s.id; b.dataset.id = s.id;
+    b.title = s.name + " (K1 = " + s.K1 + ", K2 = " + s.K2 + ")";
+    b.addEventListener("click", function () { load(s.id); });
+    chipBox.appendChild(b);
+    var c = document.createElement("button");
+    c.type = "button"; c.className = "st card";
+    c.innerHTML = '<span class="badge ' + s.cls + '">' + s.id + '</span><h3>' + s.name + '</h3><p>' + s.text +
+      '</p><span class="mono">K₁ = ' + s.K1 + ' · K₂ = ' + s.K2 + '</span>';
+    c.addEventListener("click", function () {
+      load(s.id);
+      document.querySelector(".lab").scrollIntoView({ behavior: X.reduced ? "auto" : "smooth", block: "start" });
+    });
+    cardBox.appendChild(c);
+  });
+
+  function markPreset() {
+    chipBox.querySelectorAll(".chipbtn").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === current ? "true" : "false"); });
+  }
+  function setK(k1, k2, fromPreset) {
+    sim.K1 = Math.round(k1 * 10) / 10; sim.K2 = Math.round(k2 * 10) / 10;
+    K1s.value = sim.K1; K2s.value = sim.K2;
+    $("K1v").textContent = sim.K1.toFixed(1); $("K2v").textContent = sim.K2.toFixed(1);
+    if (!fromPreset) { current = null; markPreset(); }
+    drawPlane(); kick();
+  }
+  function scramble() { seed = (seed * 9301 + 49297) % 233280 + 1; sim.reset(seed); series.clear(); }
+  function load(id) {
+    var s = STATES.filter(function (q) { return q.id === id; })[0];
+    current = id; markPreset(); setK(s.K1, s.K2, true);
+    sim.reset(seed); series.clear(); kick();
+  }
+
+  K1s.addEventListener("input", function () { setK(+K1s.value, sim.K2); });
+  K2s.addEventListener("input", function () { setK(sim.K1, +K2s.value); });
+  $("N").addEventListener("change", function () { sim.resize(+this.value, seed); series.clear(); kick(); });
+  $("spd").addEventListener("input", function () { speed = +this.value; $("spdv").textContent = speed + "×"; });
+  $("scramble").addEventListener("click", function () { scramble(); kick(); });
+  $("sync").addEventListener("click", function () { for (var i = 0; i < sim.N; i++) sim.th[i] = 0; sim.t = 0; series.clear(); kick(); });
+  var playBtn = $("play");
+  function syncPlay() {
+    playBtn.querySelector("span").textContent = running ? "Pause" : "Play";
+    playBtn.querySelector("svg").innerHTML = running
+      ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
+      : '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z"/>';
+  }
+  playBtn.addEventListener("click", function () { running = !running; syncPlay(); kick(); });
+
+  /* coupling plane: x = K2, y = K1, both in [-10, 10] */
+  var PL = { l: 40, r: 10, t: 10, b: 38 };
+  function planeXY(k2, k1) {
+    var pw = cPlane.w - PL.l - PL.r, ph = cPlane.h - PL.t - PL.b;
+    return [PL.l + pw * (k2 + 10) / 20, PL.t + ph * (1 - (k1 + 10) / 20)];
+  }
+  function drawPlane() {
+    var c = cPlane, ctx = c.ctx, T = X.tok;
+    ctx.clearRect(0, 0, c.w, c.h);
+    var f = X.frame(c, PL, "K₂", "K₁", [[0, "−10"], [.5, "0"], [1, "10"]], [[0, "−10"], [.5, "0"], [1, "10"]]);
+    // region where the incoherent state is linearly stable: K1 < 4 and K2 < 4
+    var p4 = planeXY(4, 4), p0 = planeXY(-10, -10);
+    ctx.fillStyle = T["g-green"]; ctx.globalAlpha = .1;
+    ctx.fillRect(p0[0], p4[1], p4[0] - p0[0], p0[1] - p4[1]);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = T["on-surface-variant"]; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(p4[0], f.y0); ctx.lineTo(p4[0], f.y0 + f.ph); ctx.moveTo(f.x0, p4[1]); ctx.lineTo(f.x0 + f.pw, p4[1]); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = "11px 'Google Sans Code', ui-monospace, monospace"; ctx.fillStyle = T["on-surface-variant"];
+    ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+    ctx.fillText("IC stable", f.x0 + 6, f.y0 + f.ph - 4);
+    ctx.fillText("4", p4[0] + 3, f.y0 + 12);
+    ctx.textAlign = "right"; ctx.fillText("4", f.x0 + f.pw - 3, p4[1] - 2);
+    STATES.forEach(function (s) {
+      var p = planeXY(s.K2, s.K1);
+      ctx.fillStyle = T["on-surface-variant"]; ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, 2 * Math.PI); ctx.fill();
+      ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(s.id, p[0] + 6, p[1]);
+    });
+    var q = planeXY(sim.K2, sim.K1);
+    ctx.strokeStyle = T.primary; ctx.lineWidth = 1; ctx.globalAlpha = .5;
+    ctx.beginPath(); ctx.moveTo(q[0], f.y0); ctx.lineTo(q[0], f.y0 + f.ph); ctx.moveTo(f.x0, q[1]); ctx.lineTo(f.x0 + f.pw, q[1]); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.fillStyle = T.primary;
+    ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = T.surface; ctx.lineWidth = 2; ctx.stroke();
+  }
+  function planePick(e) {
+    var r = cPlane.el.getBoundingClientRect();
+    var pw = cPlane.w - PL.l - PL.r, ph = cPlane.h - PL.t - PL.b;
+    var k2 = ((e.clientX - r.left - PL.l) / pw) * 20 - 10, k1 = (1 - (e.clientY - r.top - PL.t) / ph) * 20 - 10;
+    setK(Math.max(-10, Math.min(10, k1)), Math.max(-10, Math.min(10, k2)));
+  }
+  var dragging = false;
+  cPlane.el.addEventListener("pointerdown", function (e) { dragging = true; cPlane.el.setPointerCapture(e.pointerId); planePick(e); });
+  cPlane.el.addEventListener("pointermove", function (e) { if (dragging) planePick(e); });
+  cPlane.el.addEventListener("pointerup", function () { dragging = false; });
+  if ("ResizeObserver" in window) new ResizeObserver(function () { cPlane.fit(); drawPlane(); }).observe(cPlane.el);
+
+  /* main drawing */
+  function colOf(i) { return sim.w[i] < 0 ? X.tok["g-blue"] : X.tok["g-red"]; }
+
+  function drawRing(o) {
+    var c = cRing, ctx = c.ctx, w = c.w, h = c.h, T = X.tok, N = sim.N;
+    var X0 = w / 2, Y0 = h / 2, R = Math.min(w, h) / 2 - 22;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = T["outline-variant"]; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(X0, Y0, R, 0, 2 * Math.PI); ctx.stroke();
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.arc(X0, Y0, R * 0.32, 0, 2 * Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X0 - R, Y0); ctx.lineTo(X0 + R, Y0); ctx.moveTo(X0, Y0 - R); ctx.lineTo(X0, Y0 + R); ctx.stroke();
+    ctx.setLineDash([]);
+    var rd = N > 1500 ? 1.7 : N > 700 ? 2.1 : 2.7;
+    ctx.globalAlpha = .85;
+    for (var i = 0; i < N; i++) {
+      var rr = R * (0.36 + 0.62 * sim.rank[i]);
+      ctx.fillStyle = colOf(i);
+      ctx.beginPath(); ctx.arc(X0 + rr * Math.cos(sim.th[i]), Y0 - rr * Math.sin(sim.th[i]), rd, 0, 2 * Math.PI); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // r2 axis: a line through the centre along psi2/2, length r2
+    var a2 = o.psi2 / 2, L2 = R * 0.3 * o.r2;
+    ctx.strokeStyle = T["g-green"]; ctx.lineWidth = 4; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(X0 - L2 * Math.cos(a2), Y0 + L2 * Math.sin(a2)); ctx.lineTo(X0 + L2 * Math.cos(a2), Y0 - L2 * Math.sin(a2)); ctx.stroke();
+    // r1 arrow
+    var L1 = R * 0.3 * o.r1, ex = X0 + L1 * Math.cos(o.psi1), ey = Y0 - L1 * Math.sin(o.psi1);
+    ctx.strokeStyle = T["on-surface"]; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(X0, Y0); ctx.lineTo(ex, ey); ctx.stroke();
+    if (L1 > 8) {
+      ctx.fillStyle = T["on-surface"];
+      var ang = Math.atan2(-(ey - Y0), ex - X0);
+      ctx.beginPath();
+      ctx.moveTo(ex + 7 * Math.cos(ang), ey - 7 * Math.sin(ang));
+      ctx.lineTo(ex + 7 * Math.cos(ang + 2.4), ey - 7 * Math.sin(ang + 2.4));
+      ctx.lineTo(ex + 7 * Math.cos(ang - 2.4), ey - 7 * Math.sin(ang - 2.4));
+      ctx.fill();
+    }
+    ctx.lineCap = "butt";
+    ctx.fillStyle = T["on-surface-variant"]; ctx.font = "12px 'Google Sans Code', ui-monospace, monospace";
+    ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText("θ = 0", X0 + R + 4 > w - 40 ? X0 + R - 40 : X0 + R + 4, Y0 - 10);
+  }
+
+  var WMAX = 8;
+  function drawTW() {
+    var c = cTW, ctx = c.ctx;
+    ctx.clearRect(0, 0, c.w, c.h);
+    var f = X.frame(c, { l: 44, r: 12, t: 12, b: 40 }, "natural frequency ω", "phase θ",
+      [[0, "−" + WMAX], [.5, "0"], [1, "" + WMAX]], [[0, "−π"], [.5, "0"], [1, "π"]]);
+    var N = sim.N, rd = N > 1500 ? 1.5 : 2;
+    for (var i = 0; i < N; i++) {
+      var w = sim.w[i];
+      if (w < -WMAX || w > WMAX) continue;
+      ctx.fillStyle = colOf(i);
+      ctx.beginPath();
+      ctx.arc(f.x0 + f.pw * (w + WMAX) / (2 * WMAX), f.y0 + f.ph * (1 - (sim.th[i] + Math.PI) / (2 * Math.PI)), rd, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  function readState(r1, r2) {
+    if (r1 < 0.08 && r2 < 0.08) return ["IC", "Incoherent state", "c-tertiary"];
+    if (r2 > 0.4 && r1 < 0.1) return ["APMS", "Antipodal multibranch state", "c-primary"];
+    if (r1 > 0.15) return ["SBMS", "Symmetry-broken multibranch state", "c-secondary"];
+    return [null, "Settling or in between", "c-error"];
+  }
+  /* separation of the two locked clusters: 2-means on the circle over the slow oscillators (|ω| < 1.5),
+     reported only when both groups are tight (each cluster's own order parameter > 0.8) */
+  function deltaTheta() {
+    var N = sim.N, idx = [], i, it;
+    for (i = 0; i < N; i++) if (Math.abs(sim.w[i]) < 1.5) idx.push(i);
+    if (idx.length < 10) return null;
+    var best = null;
+    for (var s0 = 0; s0 < 4; s0++) {       // a few starts, keep the tightest split
+      var c1 = sim.th[idx[Math.floor(s0 * idx.length / 4)]], c2 = c1 + Math.PI, A, B, na, nb;
+      for (it = 0; it < 10; it++) {
+        A = [0, 0]; B = [0, 0]; na = 0; nb = 0;
+        for (var k = 0; k < idx.length; k++) {
+          var t = sim.th[idx[k]], c = Math.cos(t), s = Math.sin(t);
+          if (Math.cos(t - c1) >= Math.cos(t - c2)) { A[0] += c; A[1] += s; na++; } else { B[0] += c; B[1] += s; nb++; }
+        }
+        c1 = Math.atan2(A[1], A[0]); c2 = Math.atan2(B[1], B[0]);
+      }
+      var tight = Math.min(na ? Math.hypot(A[0], A[1]) / na : 0, nb ? Math.hypot(B[0], B[1]) / nb : 0);
+      if (!best || tight > best[0]) best = [tight, c1, c2, Math.min(na, nb) / idx.length];
+    }
+    if (best[0] < 0.8 || best[3] < 0.15) return null;
+    var g = Math.abs(best[1] - best[2]) % (2 * Math.PI);
+    return g > Math.PI ? 2 * Math.PI - g : g;
+  }
+
+  var lastO = sim.order(), frame = 0, lastSteps = 0;
+  function draw() {
+    drawRing(lastO); drawTW();
+    X.plotSeries(cSeries, series, [X.tok["g-blue"], X.tok["g-green"]]);
+  }
+  X.onTheme(function () { drawPlane(); draw(); });
+
+  function tick() {
+    if (running) {
+      var t0 = performance.now();
+      lastSteps = sim.advance(0.012 * speed);
+      // keep the frame light on slow machines: back off the speed if a frame overruns
+      if (performance.now() - t0 > 30 && speed > 1) { speed--; $("spd").value = speed; $("spdv").textContent = speed + "×"; }
+    }
+    lastO = sim.order();
+    if (running || !series.t.length) series.push(sim.t, { r1: lastO.r1, r2: lastO.r2 });
+    draw();
+    if (frame++ % 6 === 0) {
+      var r1 = series.mean("r1", 40), r2 = series.mean("r2", 40);
+      $("or1").textContent = lastO.r1.toFixed(3); $("or2").textContent = lastO.r2.toFixed(3);
+      var dt = deltaTheta();
+      $("odt").textContent = dt == null ? "–" : (dt / Math.PI).toFixed(3) + "π";
+      var st = readState(r1, r2), chip = $("ostate");
+      chip.className = "state-chip " + st[2]; chip.innerHTML = "<i></i>" + (st[0] || "…");
+      $("ostateName").textContent = st[1];
+      $("clock").textContent = "t = " + sim.t.toFixed(1) + " · N = " + sim.N;
+      $("stepinfo").textContent = lastSteps + " RK4 steps / frame";
+    }
+  }
+  var lp = X.loop($("labSec"), tick);
+  function kick() { lp.kick(); }
+
+  syncPlay();
+  load("APMS");
+  drawPlane();
+})();
+</script>
+</body>
